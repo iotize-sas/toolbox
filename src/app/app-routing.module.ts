@@ -14,7 +14,14 @@ const routes: Routes = [
   {
     path: 'list',
     loadChildren: './list/list.module#ListPageModule'
-  }
+  },
+  { 
+    path: 'terminal',
+    loadChildren: './terminal/terminal.module#TerminalPageModule'
+  },  { path: 'terminal-view', loadChildren: './terminal/terminal-view/terminal-view.module#TerminalViewPageModule' },
+  { path: 'settings', loadChildren: './terminal/settings/settings.module#SettingsPageModule' }
+
+
 ];
 
 @NgModule({

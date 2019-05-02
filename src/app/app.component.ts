@@ -24,6 +24,11 @@ export class AppComponent {
       title: 'Terminal',
       url: '/terminal',
       icon: 'code-working'
+    },
+    {
+      title: 'Modbus',
+      url: '/modbus',
+      icon: 'swap'
     }
   ];
 

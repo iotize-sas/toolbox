@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -10,22 +10,29 @@
 </ion-header>
 
 <ion-content>
-  <ion-refresher slot="fixed" (ionRefresh)="refreshDevices()">
+  <ion-refresher slot="fixed" (ionRefresh)="refreshDevices($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list>
     <ion-list-header>
-      <ion-label>Devices</ion-label>
+      <ion-label>
+        Devices
+      </ion-label>
     </ion-list-header>
     <ng-container *ngFor="let device of devices">
-      <ng-container [ngTemplateOutlet]="device.address != ble.selectedDevice? connectBlock : disconnectBlock"
+      <ng-container [ngTemplateOutlet]="isConnected(device)? disconnectBlock : connectBlock"
         [ngTemplateOutletContext]="{device: device}">
       </ng-container>
     </ng-container>
   </ion-list>
 </ion-content>
 <ion-footer>
-  <ion-button>{{}}</ion-button>
+  <ion-button *ngIf="!comService.isScanning" (click)="startScan()" expand="full">
+    Start scan
+  </ion-button>
+  <ion-button *ngIf="comService.isScanning" (click)="stopScan()" expand="full">
+    Stop scan
+  </ion-button>
 </ion-footer>
 
 <ng-template #connectBlock let-device="device">
