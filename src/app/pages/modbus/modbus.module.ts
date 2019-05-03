@@ -1,25 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
 import { ModbusPage } from './modbus.page';
-
-const routes: Routes = [
-  {
-    path: '',
-    component: ModbusPage
-  }
-];
+import { ModbusPageRoutingModule } from './modbus.router.module';
+import { ModbusViewPageModule } from './modbus-view/modbus-view.module';
+import { ModbusSettingsPageModule } from './settings/settings.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes)
+    ModbusPageRoutingModule,
+    ModbusViewPageModule,
+    ModbusSettingsPageModule
   ],
   declarations: [ModbusPage]
 })

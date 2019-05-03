@@ -1,23 +1,23 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { TerminalPage } from './terminal.page';
+import { ModbusPage } from './modbus.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: TerminalPage,
+    component: ModbusPage,
     children: [
       {
         path: '',
-        redirectTo: 'terminal',
+        redirectTo: 'modbus',
         pathMatch: 'full',
       },
       {
-        path: 'terminal',
+        path: 'modbus',
         children: [
           {
             path: '',
-            loadChildren: './terminal-view/terminal-view.module#TerminalViewPageModule'
+            loadChildren: './modbus-view/modbus-view.module#ModbusViewPageModule'
           }
         ]
       },
@@ -26,7 +26,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: './settings/settings.module#TerminalSettingsPageModule'
+            loadChildren: './settings/settings.module#ModbusSettingsPageModule'
           }
         ]
       }
@@ -44,4 +44,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class TerminalPageRoutingModule { }
+export class ModbusPageRoutingModule { }

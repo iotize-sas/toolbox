@@ -6,7 +6,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { SettingsPage } from './settings.page';
-import { PipeModule } from 'src/app/pipes/pipes.modules';
 
 const routes: Routes = [
   {
@@ -20,9 +19,8 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes),
-    PipeModule
+    RouterModule.forChild(routes)
   ],
   declarations: [SettingsPage]
 })
-export class TerminalSettingsPageModule {}
+export class ModbusSettingsPageModule {}

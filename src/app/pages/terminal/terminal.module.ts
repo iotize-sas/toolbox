@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { TerminalPage } from './terminal.page';
 import { TerminalPageRoutingModule } from './terminal.router.module';
 import { TerminalViewPageModule } from './terminal-view/terminal-view.module';
-import { SettingsPageModule } from './settings/settings.module';
+import { TerminalSettingsPageModule } from './settings/settings.module';
 
 @NgModule({
   imports: [
@@ -16,7 +16,7 @@ import { SettingsPageModule } from './settings/settings.module';
     IonicModule,
     TerminalPageRoutingModule,
     TerminalViewPageModule,
-    SettingsPageModule
+    TerminalSettingsPageModule
   ],
   declarations: [TerminalPage]
 })

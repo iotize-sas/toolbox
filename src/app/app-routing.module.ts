@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes, RouteReuseStrategy } from '@angular/router';
-import { CustomReuseStrategy } from './custom-reuse-strategy';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
@@ -16,8 +15,10 @@ const routes: Routes = [
     path: 'terminal',
     loadChildren: './pages/terminal/terminal.module#TerminalPageModule'
   },
-  { path: 'modbus', loadChildren: './pages/modbus/modbus.module#ModbusPageModule' }
-
+  {
+    path: 'modbus',
+    loadChildren: './pages/modbus/modbus.module#ModbusPageModule'
+  }
 ];
 
 @NgModule({
