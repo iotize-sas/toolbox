@@ -1,5 +1,4 @@
 import { Subject, ReplaySubject, Observer } from 'rxjs';
-import { skip } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
 

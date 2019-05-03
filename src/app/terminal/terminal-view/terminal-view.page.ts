@@ -23,7 +23,7 @@ export class TerminalViewPage implements OnInit {
     public modalController: ModalController) { }
 
   ngOnInit() {
-    console.log('terminal-view init');
+    console.log('[TerminalViewPage] init');
     if (!this.terminal.settings.didFetchSettings) {
       this.terminal.settings.getUARTSettings();
     }
