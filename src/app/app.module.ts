@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 import { IotizeNgComModule } from "iotize-ng-com";
+import { ComponentsModule } from './components/components.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,7 +19,8 @@ import { IotizeNgComModule } from "iotize-ng-com";
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    IotizeNgComModule
+    IotizeNgComModule,
+    ComponentsModule
   ],
   providers: [
     StatusBar,
