@@ -1,0 +1,13 @@
+<ion-tabs (ionTabsDidChange)="tabChanged()">
+    <ion-tab-bar slot="bottom" color="primary">
+      <ion-tab-button tab="terminal">
+        <ion-icon name="code-working"></ion-icon>
+        <ion-label>Terminal</ion-label>
+        <ion-router-outlet name="terminal"></ion-router-outlet>
+      </ion-tab-button>
+      <ion-tab-button tab="settings">
+        <ion-icon name="settings"></ion-icon>
+        <ion-label>Settings</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>

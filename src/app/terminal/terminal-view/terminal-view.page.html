@@ -1,0 +1,24 @@
+<ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>Terminal</ion-title>
+      <ion-buttons slot="start">
+        <ion-button (click)="clear()">Clear</ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end">
+        <ion-button (click)="openSettingsModal()">
+          <ion-icon slot="icon-only" name="settings"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="log" [scrollY]="true">
+      <span *ngFor="let line of logLines" [class]="line.level">{{line.message}}</span>
+  </ion-content>
+  <ion-footer>
+    <ion-item>
+      <ion-input type="text" placeholder="Data input" class="text-input" [(ngModel)]="terminal.input" (keyup.enter)="send()"></ion-input>
+      <ion-button slot="end" color="dark" (click)="send()"><ion-icon name="send"></ion-icon></ion-button>
+    </ion-item>
+  </ion-footer>
+  

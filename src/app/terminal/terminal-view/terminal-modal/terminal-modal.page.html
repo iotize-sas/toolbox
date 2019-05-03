@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Input Settings</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">BACK</ion-button>
+      <ion-back-button text="BACKK"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <ion-label>Data format</ion-label>
+      <ion-select [(ngModel)]="terminal.dataType">
+        <ion-select-option value="ASCII">ASCII</ion-select-option>
+        <ion-select-option value="HEX">HEX</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>End of line </ion-label>
+      <ion-select [disabled]="terminal.dataType == 'HEX'" multiple="true" [(ngModel)]="terminal.endOfLine" placeholder="None">
+        <ion-select-option value="CR">CR</ion-select-option>
+        <ion-select-option value="LF">LF</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Reading task</ion-label>
+      {{terminal.readingTaskOn? "ON" : "OFF"}}
+    </ion-item>
+  </ion-list>
+</ion-content>

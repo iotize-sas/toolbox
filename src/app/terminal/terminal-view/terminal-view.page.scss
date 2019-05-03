@@ -1,0 +1,37 @@
+ion-content {
+    --background: #2D3134;
+}
+
+span {
+    white-space: pre-line;
+}
+
+.log {
+    width: 100%;
+    height: 100%;
+    padding: 0rem 1rem;
+    display: block;
+}
+
+.error {
+    color: red;
+
+}
+
+.info {
+    color: lightgray;
+}
+
+.text-input {
+    color: white;
+}
+
+ion-footer {
+    background-color: #2D3134 !important;
+    border-top: 1px solid lightgray;
+}
+
+ion-item {
+    background-color: #2D3134;
+    --background: #2D3134;
+}

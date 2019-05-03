@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { PreloadAllModules, RouterModule, Routes, RouteReuseStrategy } from '@angular/router';
+import { CustomReuseStrategy } from './custom-reuse-strategy';
 
 const routes: Routes = [
   {
@@ -18,10 +19,7 @@ const routes: Routes = [
   { 
     path: 'terminal',
     loadChildren: './terminal/terminal.module#TerminalPageModule'
-  },  { path: 'terminal-view', loadChildren: './terminal/terminal-view/terminal-view.module#TerminalViewPageModule' },
-  { path: 'settings', loadChildren: './terminal/settings/settings.module#SettingsPageModule' }
-
-
+  }
 ];
 
 @NgModule({
