@@ -26,7 +26,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: './settings/settings.module#TerminalSettingsPageModule'
+            loadChildren: './terminal-settings/terminal-settings.module#TerminalSettingsPageModule'
           }
         ]
       }
