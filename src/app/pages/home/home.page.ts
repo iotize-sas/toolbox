@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { IoTizeTap, DiscoveredDeviceType } from 'iotize-ng-com';
 import { ToastController } from '@ionic/angular';
-import { ComService } from '../services/com.service';
+import { ComService } from '../../services/com.service';
 
 @Component({
   selector: 'app-home',
