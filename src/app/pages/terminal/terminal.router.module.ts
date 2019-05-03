@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, RouteReuseStrategy } from '@angular/router';
 import { TerminalPage } from './terminal.page';
-import { CustomReuseStrategy } from '../custom-reuse-strategy';
+import { CustomReuseStrategy } from '../../custom-reuse-strategy';
 
 const routes: Routes = [
   {

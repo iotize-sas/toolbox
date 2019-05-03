@@ -10,16 +10,14 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    loadChildren: './home/home.module#HomePageModule'
-  },
-  {
-    path: 'list',
-    loadChildren: './list/list.module#ListPageModule'
+    loadChildren: './pages/home/home.module#HomePageModule'
   },
   { 
     path: 'terminal',
-    loadChildren: './terminal/terminal.module#TerminalPageModule'
-  }
+    loadChildren: './pages/terminal/terminal.module#TerminalPageModule'
+  },
+  { path: 'modbus', loadChildren: './pages/modbus/modbus.module#ModbusPageModule' }
+
 ];
 
 @NgModule({
