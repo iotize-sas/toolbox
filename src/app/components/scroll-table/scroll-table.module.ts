@@ -1,20 +1,18 @@
 import { NgModule } from '@angular/core';
+import { ScrollTableComponent } from './scroll-table.component';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LoginComponent } from './login/login.component';
-import { ScrollTableComponent } from './scroll-table/scroll-table.component';
 
 @NgModule({
-    declarations: [LoginComponent, ScrollTableComponent],
+    declarations: [ScrollTableComponent],
     imports: [
         IonicModule,
         CommonModule,
         FormsModule,
     ],
     exports: [
-        LoginComponent,
         ScrollTableComponent
     ]
   })
-  export class ComponentsModule {}
+  export class ScrollTableModule {}
