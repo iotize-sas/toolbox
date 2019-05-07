@@ -1,0 +1,105 @@
+<ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>
+        Settings
+      </ion-title>
+      <ion-buttons slot="end">
+        <ion-button *ngIf="!isLogged" (click)="openLoginAlert()">
+          <ion-icon slot="end" name="log-in"></ion-icon>
+          Login
+        </ion-button>
+        <ion-button *ngIf="isLogged" (click)="openLogoutAlert()">
+          <ion-icon slot="end" name="log-out"></ion-icon>
+          Logout
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-list-header *ngIf="terminal.tapService.session">
+        <ion-label>
+          User informations
+        </ion-label>
+      </ion-list-header>
+      <ion-item *ngIf="terminal.tapService.session">
+        <ion-label>Name</ion-label>
+        <span>{{terminal.tapService.session.name}}</span>
+      </ion-item>
+      <ion-list-header>
+        <ion-label>
+          Communication settings
+        </ion-label>
+      </ion-list-header>
+      <ion-item>
+        <ion-label>Physical port</ion-label>
+        <ion-select [(ngModel)]="settings.physicalPort">
+          <ion-select-option *ngFor="let option of UartSettings.PhysicalPort | enum" [(value)]="option.index">
+            {{option.value}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Timeout</ion-label>
+        <ion-input type="number" [(ngModel)]="settings.settings.timeout" class="right-align"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Handshake</ion-label>
+        <ion-select [(ngModel)]="settings.handshakeValue">
+          <ion-select-option *ngFor="let option of UartSettings.Handshake | enum" [(value)]="option.index">{{option.value}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Handshake delimiter</ion-label>
+        <ion-select [(ngModel)]="settings.handshakeDelimiter">
+          <ion-select-option *ngFor="let option of UartSettings.HandshakeDelimiter | enum" [(value)]="option.index">
+            {{option.value}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <!-- <ion-item>
+        <ion-label>Offset first register</ion-label>
+        <ion-select [(ngModel)]="settings.ofs">
+          <ion-select-option value="false">False</ion-select-option>
+          <ion-select-option value="true">True</ion-select-option>
+        </ion-select>
+      </ion-item> -->
+      <ion-item>
+        <ion-label>
+          Baud rate
+        </ion-label>
+        <ion-select [(ngModel)]="settings.settings.baudRate">
+          <ion-select-option *ngFor="let baud of settings.BAUD_RATES" [value]="baud">{{baud}} bauds</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Data bits</ion-label>
+        <ion-select [(ngModel)]="settings.dataBitsLength">
+          <ion-select-option *ngFor="let option of UartSettings.DataBitsLength | enum" [(value)]="option.index">
+            {{option.value | trim:'_'}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Bit parity</ion-label>
+        <ion-select [(ngModel)]="settings.bitParity">
+          <ion-select-option *ngFor="let option of UartSettings.BitParity | enum" [(value)]="option.index">{{option.value}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Stop bit</ion-label>
+        <ion-select [(ngModel)]="settings.stopBit">
+          <ion-select-option *ngFor="let option of UartSettings.StopBit | enum" [(value)]="option.index">{{option.value}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="changeSettings()">Apply settings</ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button (click)="readSettingsFromTap()">Read from tap</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-list>
+  
+  </ion-content>

@@ -17,7 +17,7 @@ export class TerminalService {
   private readingData = false;
   private refreshTime = 500;
   dataType: 'ASCII' | 'HEX' = 'ASCII';
-  endOfLine: Array<string> = [];
+  endOfLine: Array<'CR' | 'LF'> = ['CR'];
   timer: Observable<number> = null;
   readingTaskSubscription: Subscription = null;
   input = '';
@@ -30,12 +30,16 @@ export class TerminalService {
 
   async send(data: Uint8Array) {
     try {
+      if (!this.tapService.isReady) {
+        this.events.publish('disconnected');
+        return;
+      }
       const response = (await this.tapService.tap.service.target.send(data));
       if (response.isSuccess()) {
         if (response.body().byteLength === 0) {
           this.logger.log('info', 'sent: ');
           await this.readAllTargetData();
-          return;
+          return; 
         }
       } else {
         this.handleIoTizeErrors(response);
@@ -84,7 +88,7 @@ export class TerminalService {
     this.readingData = true;
     try {
       const response = (await this.tapService.tap.service.target.readBytes());
-      if (response.isSuccess()) {
+      if (response.isSuccessful()) {
         let responseBody = response.body();
         if (responseBody.byteLength > 0) {
           let responseString = '';
@@ -100,7 +104,7 @@ export class TerminalService {
         }
         return;
       } else {
-        this.logger.log('error', `tap responded ${ResultCodeTranslation[response.codeRet()]}`);
+        this.handleIoTizeErrors(response);
       }
     } catch (error) {
       this.readingData = false;

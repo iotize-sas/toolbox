@@ -1,4 +1,4 @@
-import { Subject, ReplaySubject, Observer } from 'rxjs';
+import { Subject, ReplaySubject, Observer, Subscription } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 
@@ -17,11 +17,13 @@ export class LoggerService {
   logLinesHistory$: ReplaySubject<Logline>;
   logLines$: Subject<Logline>;
   lastLogLevel?: 'info' | 'error';
-  private lineCount = 0;
+  private logSubscription?: Subscription;
+  // private lineCount = 0;
 
   constructor() {
     this.logLinesHistory$ = new ReplaySubject<Logline>();
     this.logLines$ = new Subject<Logline>();
+    this.initLogLinesSubject();
   }
 
   log(level: 'info' | 'error', string: string) {
@@ -33,17 +35,17 @@ export class LoggerService {
         string = LoggerService.LineSeparator + string;
       }
     }
-    this.lineCount++;
 
-    this.logLines$.next({
+    this.logLinesHistory$.next({
       level: level,
       message: string
     });
     this.lastLogLevel = level;
+
   }
 
   getLogLinesObservable() {
-    return this.logLines$.asObservable();
+    return this.logLinesHistory$.asObservable();
   }
 
   clearHistory() {
@@ -53,17 +55,19 @@ export class LoggerService {
   }
 
   private initLogLinesSubject() {
+    console.log("[LoggerService] creating intermediate subject");
     let observer: Observer<Logline> = {
       next: line => {
+        console.log("[initLogLinesSubject]: received new line");
         this.logLines$.next(line);
       },
       error: error => {
-        console.error(error);
+        this.log("error", error.message? error.message: error);
       },
       complete: () => {
-        console.debug("[initLogLinesSubject]: longLinesHistory completed")
+        console.log("[initLogLinesSubject]: logLinesHistory completed");
       }
     }
-    this.logLinesHistory$.subscribe(observer);
+    this.logSubscription = this.logLinesHistory$.subscribe(observer);
   }
 }

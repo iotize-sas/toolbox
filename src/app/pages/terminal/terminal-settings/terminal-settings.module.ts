@@ -5,13 +5,14 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { SettingsPage } from './settings.page';
+import { TerminalSettingsPage } from './terminal-settings.page';
 import { PipeModule } from 'src/app/pipes/pipes.modules';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 const routes: Routes = [
   {
     path: '',
-    component: SettingsPage
+    component: TerminalSettingsPage
   }
 ];
 
@@ -21,8 +22,9 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
-    PipeModule
+    PipeModule,
+    ComponentsModule
   ],
-  declarations: [SettingsPage]
+  declarations: [TerminalSettingsPage]
 })
 export class TerminalSettingsPageModule {}

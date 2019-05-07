@@ -49,6 +49,7 @@ export class SettingsService {
       }
       if (response.codeRet() === ResultCode.IOTIZE_401_UNAUTHORIZED) {
         this.didFetchSettings = false;
+        await this.tapService.sessionStateForceUpdate();
         throw new Error('Login required');
       }
       throw new Error('getUARTSettings response failed: ' + ResultCodeTranslation[response.codeRet()]);
