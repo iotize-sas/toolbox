@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-refresher slot="fixed" (ionRefresh)="refreshDevices($event)">
+  <ion-refresher slot="fixed" (ionRefresh)="refreshDevices($event)" pullMin="120">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list>
