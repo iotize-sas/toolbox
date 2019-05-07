@@ -48,6 +48,16 @@ export class ComService implements IoTizeComService {
         break;
     }
     return isScanning;
-  } 
+  }
 
+  devicesArray(): Observable<DiscoveredDeviceType[]> {
+    return this.getselectedComService().devicesArray();
+  }
+  clearDevices(): void {
+    const except = [];
+    if (!!this.selectedDevice) {
+      except.push(this.selectedDevice);
+    }
+    this.getselectedComService().clearDevices(except);
+  }
 }

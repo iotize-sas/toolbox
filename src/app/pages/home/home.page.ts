@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { IoTizeTap, DiscoveredDeviceType } from 'iotize-ng-com';
 import { ToastController, LoadingController } from '@ionic/angular';
 import { ComService } from '../../services/com.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -13,17 +14,23 @@ export class HomePage {
     public tapService: IoTizeTap,
     private toast: ToastController,
     private changeDetector: ChangeDetectorRef,
-    public loadingCtrl: LoadingController) { }
+    public loadingCtrl: LoadingController) {
+      this.deviceArraySubscribe();
+    }
 
   devices: DiscoveredDeviceType[] = [];
-
+  private deviceArraySubscription: Subscription;
+  private deviceArraySubscribe() {
+    this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => this.devices = arr);
+  }
   startScan() {
-    this.comService.startScan().subscribe(
-      device => {
-        console.log(device);
-          this.devices.push(device);
-          this.changeDetector.detectChanges();
-      });
+    this.comService.startScan().subscribe({error: err => this.handleError(err)});
+    // .subscribe(
+    //   device => {
+    //     console.log(device);
+    //       this.devices.push(device);
+    //       this.changeDetector.detectChanges();
+    //   });
   }
 
   async stopScan() {
@@ -60,12 +67,10 @@ export class HomePage {
   }
 
   clear() {
-    if (this.tapService.tap && this.comService.selectedDevice) {
-      this.devices.filter(device => this.isConnected(device));
-    } else {
-      this.devices.splice(0);
-    }
-    this.tapService.clear();
+    this.deviceArraySubscription.unsubscribe();
+    this.comService.clearDevices();
+    this.deviceArraySubscribe();
+    // this.tapService.clear();
   }
   
   refreshDevices(event) {
@@ -80,7 +85,8 @@ export class HomePage {
       event.target.complete();
     } catch(error) {
       event.target.complete();
-      throw error;
+      console.error(error);
+      this.handleError(error);
     }
   }
 
@@ -115,9 +121,14 @@ export class HomePage {
   }
 
   isConnected(device:DiscoveredDeviceType) {
+    let isConnected = false;
     if (this.tapService.isReady && this.comService.selectedDevice) {
-      return device.address === this.comService.selectedDevice.address
+      isConnected = device.address == this.comService.selectedDevice.address
     }
-    return false;
+    console.log(`Device ${device.name} is ${!isConnected? 'not':''} connected`);
+    console.log(`Device address: ${device.address}`)
+    console.log(`ConnectedDevice address: ${this.comService.selectedDevice? this.comService.selectedDevice.address : 'no device connected'}`)
+    console.log(`is tap ready? ${this.tapService.isReady}`);
+    return isConnected;
   }
 }
