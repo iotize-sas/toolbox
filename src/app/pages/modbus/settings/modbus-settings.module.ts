@@ -5,14 +5,14 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ModbusViewPage } from './modbus-view.page';
-import { ComponentsModule } from 'src/app/components/components.module';
+import { ModbusSettingsPage } from './modbus-settings.page';
 import { PipeModule } from 'src/app/pipes/pipes.modules';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 const routes: Routes = [
   {
     path: '',
-    component: ModbusViewPage
+    component: ModbusSettingsPage
   }
 ];
 
@@ -22,9 +22,9 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
-    ComponentsModule,
-    PipeModule
+    PipeModule,
+    ComponentsModule
   ],
-  declarations: [ModbusViewPage]
+  declarations: [ModbusSettingsPage]
 })
-export class ModbusViewPageModule {}
+export class ModbusSettingsPageModule {}

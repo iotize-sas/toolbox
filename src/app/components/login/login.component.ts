@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, ChangeDetectorRef, Input } from '@angular/core';
 import { ToastController, AlertController, LoadingController } from '@ionic/angular';
 import { IoTizeTap } from 'iotize-ng-com';
 
@@ -7,7 +7,7 @@ import { IoTizeTap } from 'iotize-ng-com';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
   @Input() displayText: boolean;
 
@@ -16,8 +16,6 @@ export class LoginComponent implements OnInit {
               public tapService: IoTizeTap,
               public changeDetector: ChangeDetectorRef,
               public loadingCtrl: LoadingController) { }
-
-  ngOnInit() {}
 
   async openLoginAlert() {
     const alert = await this.alertCtrl.create({

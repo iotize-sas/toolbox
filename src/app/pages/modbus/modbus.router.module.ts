@@ -26,7 +26,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: './settings/settings.module#ModbusSettingsPageModule'
+            loadChildren: './settings/modbus-settings.module#ModbusSettingsPageModule'
           }
         ]
       }

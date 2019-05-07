@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { IoTizeTap, DiscoveredDeviceType } from 'iotize-ng-com';
-import { ToastController } from '@ionic/angular';
+import { ToastController, LoadingController } from '@ionic/angular';
 import { ComService } from '../../services/com.service';
 
 @Component({
@@ -12,7 +12,8 @@ export class HomePage {
   constructor(public comService: ComService,
     public tapService: IoTizeTap,
     private toast: ToastController,
-    private changeDetector: ChangeDetectorRef) { }
+    private changeDetector: ChangeDetectorRef,
+    public loadingCtrl: LoadingController) { }
 
   devices: DiscoveredDeviceType[] = [];
 
@@ -20,10 +21,8 @@ export class HomePage {
     this.comService.startScan().subscribe(
       device => {
         console.log(device);
-        if (this.devices.findIndex(dev => dev.address == device.address) == -1) {
           this.devices.push(device);
           this.changeDetector.detectChanges();
-        }
       });
   }
 
@@ -37,11 +36,20 @@ export class HomePage {
     if (this.comService.isScanning) {
       await this.stopScan();
     }
+    const loader = await this.loadingCtrl.create({
+      message: 'Connecting to ' + device.name
+    });
+
+    loader.present();
+
      const connectionProtocol = this.comService.getProtocol(device);
      try {
        await this.tapService.init(connectionProtocol);
+       loader.dismiss();
+       this.showToast('Connected to ' + device.name);
        this.changeDetector.detectChanges();
      } catch (error) {
+       loader.dismiss();
        this.handleError(error);
      }
   }
@@ -88,12 +96,22 @@ export class HomePage {
     this.showError(errorString);
   }
 
-  private showError(errorMessage: string) {
-    this.toast.create({
+  private async showError(errorMessage: string) {
+    const toast = await this.toast.create({
       message: errorMessage,
       duration: 0,
       showCloseButton: true
-    })
+    });
+    toast.present();
+  }
+
+  async showToast(message: string, duration: number = 3000): Promise<void> {
+    const toast = await this.toast.create({
+      message: message,
+      duration: duration
+    });
+
+    toast.present();
   }
 
   isConnected(device:DiscoveredDeviceType) {

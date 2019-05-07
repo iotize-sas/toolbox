@@ -1,9 +1,86 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>modbus-view</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Modbus</ion-title>
+    <ion-buttons slot="end">
+      <app-login [displayText]="false"></app-login>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content class="data-table" [scrollY]="true">
+  <!-- <p>Last retrieved values</p> -->
+<ion-grid>
+    <ion-row class="grid-header sticky-header">
+      <ion-col [size]="4">Register#</ion-col>
+      <ion-col [size]="8">Value</ion-col>
+  </ion-row>
+  </ion-grid>
+  <app-scroll-table *ngFor="let modbusRead of savedModbusValues; let i = index; trackBy: savedModbusTrackFn"
+                    keyName="key"
+                    valueName="value"
+                    showHeader="true"
+                    [dataArray]="modbusRead | modbusData"
+                    [formatFn]="formatToStringFactory(modbus.displayMode, modbusRead.format)"
+                    [columnSize]="{key: 4, value: 8}"
+                    rightSlideButtonText="Delete"
+                    [rightSlideButtonStyle]="{'background': 'red'}"
+                    (rightSlideButtonClick)="deleteLine($event)"
+                    leftSlideButtonText="Refresh"
+                    (leftSlideButtonClick)="refresh(i)"
+                    ></app-scroll-table>
+  <app-scroll-table keyName="key"
+                    valueName="value"
+                    showHeader="false"
+                    [dataArray]="lastModbusRead | modbusData"
+                    [formatFn]="formatToStringFactory(modbus.displayMode)"
+                    [columnSize]="{key: 4, value: 8}"
+                    rightSlideButtonText="Keep"
+                    (rightSlideButtonClick)="keepLine($event)"
+                    ></app-scroll-table>
 </ion-content>
+<ion-footer>
+  <ion-grid class="clickable" (click)="openSettingsModal()" class="smaller-text">
+    <ion-row class="no-overflow">
+      <ion-col size="2" class="smaller-text">
+        Slave:
+      </ion-col>
+      <ion-col size="4" class="right-align">
+        {{modbus.modbusOptions.slave}}
+      </ion-col>
+      <ion-col size="2" class="smaller-text"> Register:</ion-col>
+      <ion-col size="4" class="right-align">{{modbus.modbusOptions.address}}</ion-col>
+    </ion-row>
+    <ion-row class="no-overflow">
+      <ion-col size="2" class="smaller-text">ObjectType:</ion-col>
+      <ion-col size="4" class="right-align">{{modbus.modbusOptions.objectTypeString}}</ion-col>
+      <ion-col size="2" class="smaller-text">Format:</ion-col>
+      <ion-col size="4" class="right-align">{{modbus.modbusOptions.formatString | trim: '_'}}</ion-col>
+    </ion-row>
+    <ion-row class="no-overflow">
+      <ion-col size="3" class="smaller-text">Data length:</ion-col>
+      <ion-col size="3" class="right-align">{{modbus.modbusOptions.length}}</ion-col>
+      <ion-col size="3" class="smaller-text">Display as:</ion-col>
+      <ion-col size="3" class="right-align">{{modbus.displayMode}}</ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-item>
+    <ion-input type="number" [placeholder]="canSend()? 'Data input' : 'Read only'" class="text-input" [disabled]="!canSend()" [(ngModel)]="data" (keyup.enter)="closeKeyboardAndSend(data)" clearInput>
+    </ion-input>
+  </ion-item>
+  <ion-item>  
+    <ion-grid class="com-buttons">
+      <ion-row>
+        <ion-col size="6">
+          <ion-button color="secondary" expand="block" [disabled]="!canSend()" (click)="send(data)">
+            SEND <ion-icon name="send"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button color="secondary" expand="block" (click)="read()">
+            READ <ion-icon name="search"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+</ion-footer>
