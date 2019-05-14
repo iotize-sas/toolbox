@@ -69,7 +69,7 @@ export class TerminalSettingsPage {
     } catch (error) {
       loader.dismiss();
       console.error(error);
-      await this.showToast(`ERROR : ${error}`);
+      await this.showToast(`${error}`);
     }
   }
 

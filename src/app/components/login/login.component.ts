@@ -67,7 +67,7 @@ export class LoginComponent {
     } catch (error) {
       loader.dismiss();
       console.error(error);
-      this.showClosingToast(`Login error : ${error}`);
+      this.showClosingToast(`Login error : ${error.message? error.message: error}`);
     }
 
   }
