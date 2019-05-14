@@ -11,8 +11,8 @@
   <!-- <p>Last retrieved values</p> -->
 <ion-grid>
     <ion-row class="grid-header sticky-header">
-      <ion-col [size]="4">Register#</ion-col>
-      <ion-col [size]="8">Value</ion-col>
+      <ion-col [size]="4" class="center-align">Register#</ion-col>
+      <ion-col [size]="8" class="center-align">Value</ion-col>
   </ion-row>
   </ion-grid>
   <app-scroll-table *ngFor="let modbusRead of savedModbusValues; let i = index; trackBy: savedModbusTrackFn"

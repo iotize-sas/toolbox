@@ -1,34 +1,3 @@
-// ion-content {
-//     --background: #2D3134;
-// }
-
-// .log {
-//     width: 100%;
-//     height: 100%;
-//     padding: 0rem 1rem;
-//     display: block;
-// }
-
-// .error {
-//     color: red;
-
-// }
-
-// .info {
-//     color: lightgray;
-// }
-
-// .text-input {
-//     color: white;
-// }
-
-// ion-footer {
-//     background-color: #2D3134;
-//     border-top: 1px solid lightgray;
-// }
-// ion-footer ion-button {
-//     background-color: #2D3134;
-// }
 .com-buttons {
     width: 100%;
   }
@@ -48,6 +17,10 @@
   .right-align {
     text-align: right;
     padding-right: 10px;
+  }
+
+  .center-align {
+    text-align: center !important;
   }
   
   ion-grid {
