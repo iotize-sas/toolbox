@@ -58,9 +58,9 @@ export class ModbusViewPage implements OnInit {
     return this.send(data);
   }
 
-  clear() {
-    // this.logLines.splice(0);
-  }
+  // clear() {
+  //   // this.logLines.splice(0);
+  // }
 
   async openSettingsModal() {
     const modal = await this.modalController.create({
@@ -116,8 +116,11 @@ export class ModbusViewPage implements OnInit {
   }
 
   canSend() {
-    return (this.modbus.modbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
+    if (this.modbus.deviceService.isReady) {
+      return (this.modbus.modbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
       (this.modbus.modbusOptions.objectType !== ModbusOptions.ObjectType.INPUT_REGISTER);
+    }
+    return false;
   }
 
   keepLine(id) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { TerminalService } from './services/terminal.service';
 import { Events, IonTabs, ToastController } from '@ionic/angular';
 
@@ -15,7 +15,6 @@ export class TerminalPage {
     public toast: ToastController) {
       this.events.subscribe('connected', () => this.changeDetector.detectChanges());
       this.events.subscribe('disconnected', () => this.changeDetector.detectChanges());
-      this.events.subscribe('needChangeDetection', () => this.changeDetector.detectChanges());
       this.events.subscribe('error-message', message => this.showToast(message));
   }
   @ViewChild(IonTabs) tabs: IonTabs;
@@ -38,5 +37,13 @@ export class TerminalPage {
     });
 
     toast.present();
+  }
+
+  ionViewDidLeave() {
+    this.terminal.stopReadingTask();
+  }
+
+  ionViewWillEnter() {
+    this.tabChanged();
   }
 }

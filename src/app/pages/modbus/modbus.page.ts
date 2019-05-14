@@ -15,7 +15,6 @@ export class ModbusPage implements OnInit {
     public toast: ToastController) {
       this.events.subscribe('connected', () => this.changeDetector.detectChanges());
       this.events.subscribe('disconnected', () => this.changeDetector.detectChanges());
-      this.events.subscribe('needChangeDetection', () => this.changeDetector.detectChanges());
       this.events.subscribe('error-message', message => this.showToast(message));
   }
 
