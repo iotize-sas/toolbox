@@ -1,4 +1,4 @@
-import { Subject, ReplaySubject, Observer, Subscription } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 
@@ -14,16 +14,12 @@ export class LoggerService {
 
   public static LineSeparator = '\r\n';
 
-  logLinesHistory$: ReplaySubject<Logline>;
-  logLines$: Subject<Logline>;
+  private logLines$: BehaviorSubject<Logline[]>;
+  private logLines: Logline[] = [];
   lastLogLevel?: 'info' | 'error';
-  private logSubscription?: Subscription;
-  // private lineCount = 0;
 
   constructor() {
-    this.logLinesHistory$ = new ReplaySubject<Logline>();
-    this.logLines$ = new Subject<Logline>();
-    this.initLogLinesSubject();
+    this.logLines$ = new BehaviorSubject<Logline[]>([]);
   }
 
   log(level: 'info' | 'error', string: string) {
@@ -35,39 +31,26 @@ export class LoggerService {
         string = LoggerService.LineSeparator + string;
       }
     }
-
-    this.logLinesHistory$.next({
+    this.logLines.push({
       level: level,
       message: string
     });
     this.lastLogLevel = level;
 
+    this.updateLoglines();
+
   }
 
   getLogLinesObservable() {
-    return this.logLinesHistory$.asObservable();
+    return this.logLines$.asObservable();
   }
 
   clearHistory() {
-    this.logLinesHistory$.complete();
-    this.logLinesHistory$ = new ReplaySubject<Logline>();
-    this.initLogLinesSubject();
+    this.logLines = [];
+    this.updateLoglines();
   }
 
-  private initLogLinesSubject() {
-    console.log("[LoggerService] creating intermediate subject");
-    let observer: Observer<Logline> = {
-      next: line => {
-        console.log("[initLogLinesSubject]: received new line");
-        this.logLines$.next(line);
-      },
-      error: error => {
-        this.log("error", error.message? error.message: error);
-      },
-      complete: () => {
-        console.log("[initLogLinesSubject]: logLinesHistory completed");
-      }
-    }
-    this.logSubscription = this.logLinesHistory$.subscribe(observer);
+  private updateLoglines() {
+    this.logLines$.next(this.logLines);
   }
 }

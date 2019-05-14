@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Logline, LoggerService } from '../services/logger.service';
 import { TerminalService } from '../services/terminal.service';
 import { ModalController, IonContent } from '@ionic/angular';
@@ -11,7 +11,7 @@ import { TerminalModalPage } from './terminal-modal/terminal-modal.page';
 })
 export class TerminalViewPage implements OnInit {
 
-  @ViewChild(IonContent) content: IonContent;
+  @ViewChild('content') content: IonContent;
 
   data = '';
   linesCount = 0;
@@ -19,7 +19,6 @@ export class TerminalViewPage implements OnInit {
   logLines: Array<Logline> = [];
   constructor(public terminal: TerminalService,
     public logger: LoggerService,
-    public changeDetector: ChangeDetectorRef,
     public modalController: ModalController) { }
 
   ngOnInit() {
@@ -29,10 +28,9 @@ export class TerminalViewPage implements OnInit {
     }
 
     this.logger.getLogLinesObservable()
-      .subscribe((logLine) => {
-        this.logLines.push(logLine);
-        this.changeDetector.detectChanges();
-        this.content.scrollToBottom(0);
+      .subscribe((logLines) => {
+        this.logLines = logLines;
+        this.content.scrollToBottom(0); // TODO enhance scrolling management (stop auto-scroll if user scrolled up et al)
       });
   }
 
