@@ -2,9 +2,12 @@
   <ion-item-sliding #slidingCase *ngFor="let dataLine of dataArray; let i=index">
     <ion-item no-padding>
       <ion-row class="grid-body">
-        <ion-col [size]="columnSize? columnSize.key : 6">{{dataLine[keyName]}}</ion-col>
-        <ion-col [size]="columnSize? columnSize.value : 6">
-          {{formatFn? formatFn(dataLine[valueName]) : dataLine[valueName]}}</ion-col>
+        <ion-col [size]="columnSize? columnSize.key : 6" class="centered">
+          {{dataLine[keyName]}}
+        </ion-col>
+        <ion-col [size]="columnSize? columnSize.value : 6" class="centered">
+          {{formatFn? formatFn(dataLine[valueName]) : dataLine[valueName]}}
+        </ion-col>
       </ion-row>
     </ion-item>
     <ion-item-options *ngIf="rightSlideButtonText" side="end" (ionSwipe)="rightClicked(i, slidingCase)">
