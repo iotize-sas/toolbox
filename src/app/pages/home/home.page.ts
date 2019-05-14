@@ -55,14 +55,38 @@ export class HomePage {
        loader.dismiss();
        this.showToast('Connected to ' + device.name);
        this.changeDetector.detectChanges();
-     } catch (error) {
+      } catch (error) {
+        if (error.code == "ConnectionError") {
+          //retry once to connect
+          loader.message = 'Connecting to ' + device.name + ' second attempt';
+          try {
+            await this.tapService.init(connectionProtocol);
+            loader.dismiss();
+            this.showToast('Connected to ' + device.name);
+            this.changeDetector.detectChanges();
+          } catch (secondError) {
+            loader.dismiss();
+            this.handleError(error);
+          }
+       }
        loader.dismiss();
        this.handleError(error);
      }
   }
 
   async disconnect() {
-    await this.tapService.disconnect();
+
+    const loader = await this.loadingCtrl.create({
+      message: 'Disconnecting'
+    });
+
+    loader.present();
+    try {
+      await this.tapService.disconnect();
+    } catch (error) {
+      this.showError(error);
+    }
+    loader.dismiss();
     this.comService.selectedDevice = null;
   }
 
@@ -70,7 +94,6 @@ export class HomePage {
     this.deviceArraySubscription.unsubscribe();
     this.comService.clearDevices();
     this.deviceArraySubscribe();
-    // this.tapService.clear();
   }
   
   refreshDevices(event) {
@@ -125,10 +148,6 @@ export class HomePage {
     if (this.tapService.isReady && this.comService.selectedDevice) {
       isConnected = device.address == this.comService.selectedDevice.address
     }
-    console.log(`Device ${device.name} is ${!isConnected? 'not':''} connected`);
-    console.log(`Device address: ${device.address}`)
-    console.log(`ConnectedDevice address: ${this.comService.selectedDevice? this.comService.selectedDevice.address : 'no device connected'}`)
-    console.log(`is tap ready? ${this.tapService.isReady}`);
     return isConnected;
   }
 }
