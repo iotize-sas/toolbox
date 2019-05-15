@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.iotize.toolbox" version="0.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>IoTize Toolbox</name>
-    <description>Terminal and modbus communication for TapNPass</description>
+    <description>Communication tools for IoTized devices</description>
     <author email="dev@iotize.com" href="https://iotize.com/">IoTize Solutions</author>
     <content src="index.html" />
     <access origin="*" />
