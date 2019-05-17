@@ -13,7 +13,6 @@ import { UartSettings } from '@iotize/device-client.js/device/model';
 export class ModbusSettingsPage {
 
   constructor(public settings: ModbusSettingsService,
-    // public modbus: ModbusService,
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
     public changeDetector: ChangeDetectorRef,
@@ -93,5 +92,10 @@ export class ModbusSettingsPage {
 
   closeKeyboard() {
     this.keyboard.hide();
+  }
+
+  async detectBaudRate() {
+    const validatedSettings = await this.settings.autoDetectBaudRate();
+    console.log(validatedSettings);
   }
 }
