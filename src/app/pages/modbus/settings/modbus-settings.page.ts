@@ -95,7 +95,13 @@ export class ModbusSettingsPage {
   }
 
   async detectBaudRate() {
-    const validatedSettings = await this.settings.autoDetectBaudRate();
-    console.log(validatedSettings);
+    try {
+
+      const validatedSettings = await this.settings.autoDetectBaudRate();
+      console.log(validatedSettings);
+      this.showClosingToast(`Found modbus settings`);
+    } catch (error) {
+      this.showClosingToast(`${error.message? error.message : error}`);
+    }
   }
 }

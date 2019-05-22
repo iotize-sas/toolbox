@@ -85,7 +85,9 @@
         <ion-button (click)="readSettingsFromTap()">Read from tap</ion-button>
       </ion-buttons>
     </ion-toolbar>
-    <ion-button (click)="detectBaudRate()">DETECT RATE</ion-button>
+    <ion-toolbar>
+      <ion-button (click)="detectBaudRate()" expand="block" fill="clear">AutoBaud</ion-button>
+    </ion-toolbar>
   </ion-list>
 
 </ion-content>
