@@ -5,6 +5,7 @@ import { UartSettings } from '@iotize/device-client.js/device/model';
 import { Events } from '@ionic/angular';
 import { ResultCodeTranslation, ResultCode } from '@iotize/device-client.js/client/api/response';
 import { IoTizeTap } from 'iotize-ng-com';
+import { TapService } from 'src/app/services/tap.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class SettingsService {
   didFetchSettings = false;
 
   constructor(public logger: LoggerService,
-    public tapService: IoTizeTap,
+    public tapService: TapService,
     public events: Events) {
     this._settings = {
       physicalPort: UartSettings.PhysicalPort.USB,

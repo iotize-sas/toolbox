@@ -7,6 +7,7 @@ import { takeWhile } from 'rxjs/operators';
 import { ResultCodeTranslation, ResultCode, Response } from '@iotize/device-client.js/client/api/response';
 import { IoTizeTap } from 'iotize-ng-com';
 import { Events } from '@ionic/angular';
+import { TapService } from 'src/app/services/tap.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class TerminalService {
   input = '';
 
   constructor(public logger: LoggerService,
-    public tapService: IoTizeTap,
+    public tapService: TapService,
     public settings: SettingsService,
     public events: Events) {
   }

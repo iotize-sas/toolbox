@@ -42,7 +42,8 @@ export class ModbusService {
 
     const response = await this.deviceService.tap.service.target.modbusRead(options);
     if (!response.isSuccessful()) {
-      if (firstTry && response.codeRet() === ResultCode.IOTIZE_TARGET_PROTOCOL_COM) {
+      console.log('>>>>>>> ' + response.codeRet());
+      if (firstTry) {
         await this.deviceService.tap.service.target.connect();
         return this.read(false, options);
       }

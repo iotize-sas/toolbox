@@ -4,6 +4,7 @@ import { LoggerService } from '../../terminal/services/logger.service';
 import { Events } from '@ionic/angular';
 import { IoTizeTap } from 'iotize-ng-com';
 import { ResultCodeTranslation, ResultCode } from '@iotize/device-client.js/client/api/response';
+import { TapService } from 'src/app/services/tap.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class ModbusSettingsService {
   settings: UartSettings; // displayed settings
 
   constructor(public logger: LoggerService,
-    public deviceService: IoTizeTap,
+    public deviceService: TapService,
     public events: Events) {
     this._settings = {
       physicalPort: UartSettings.PhysicalPort.USB,
@@ -41,6 +42,7 @@ export class ModbusSettingsService {
 
       if (response.isSuccess()) {
         this._settings = response.body();
+        console.log(this._settings);
         this.settings = Object.assign({}, this._settings);
         this.didFetchSettings = true;
         return;

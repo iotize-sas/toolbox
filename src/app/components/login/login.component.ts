@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, Input } from '@angular/core';
 import { ToastController, AlertController, LoadingController } from '@ionic/angular';
-import { IoTizeTap } from 'iotize-ng-com';
+import { TapService } from 'src/app/services/tap.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +13,7 @@ export class LoginComponent {
 
   constructor(public toastController: ToastController,
               public alertCtrl: AlertController,
-              public tapService: IoTizeTap,
+              public tapService: TapService,
               public changeDetector: ChangeDetectorRef,
               public loadingCtrl: LoadingController) { }
 

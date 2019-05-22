@@ -3,6 +3,7 @@ import { IoTizeTap, DiscoveredDeviceType } from 'iotize-ng-com';
 import { ToastController, LoadingController } from '@ionic/angular';
 import { ComService } from '../../services/com.service';
 import { Subscription } from 'rxjs';
+import { TapService } from 'src/app/services/tap.service';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +12,7 @@ import { Subscription } from 'rxjs';
 })
 export class HomePage {
   constructor(public comService: ComService,
-    public tapService: IoTizeTap,
+    public tapService: TapService,
     private toast: ToastController,
     private changeDetector: ChangeDetectorRef,
     public loadingCtrl: LoadingController) {
