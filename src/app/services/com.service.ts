@@ -28,7 +28,8 @@ export class ComService implements IoTizeComService {
     if (device.name) {
       this.selectedDevice = device as DiscoveredDeviceType;
     }
-    return this.getselectedComService().getProtocol(device);
+    const protocol = this.getselectedComService().getProtocol(device);
+    return protocol;
   }
 
   private getselectedComService(): IoTizeComService {

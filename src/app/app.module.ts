@@ -11,6 +11,8 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { IotizeNgComModule } from "iotize-ng-com";
 import { Keyboard } from '@ionic-native/keyboard/ngx';
+import { NFC } from '@ionic-native/nfc/ngx';
+import { ComponentsModule } from './components/components.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,13 +21,15 @@ import { Keyboard } from '@ionic-native/keyboard/ngx';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    IotizeNgComModule
+    IotizeNgComModule,
+    ComponentsModule
   ],
   providers: [
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    Keyboard
+    Keyboard,
+    NFC
   ],
   bootstrap: [AppComponent]
 })
