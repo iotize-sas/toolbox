@@ -5,7 +5,7 @@ import { TargetProtocol } from '@iotize/device-client.js/device/model';
 import { NFCComProtocol } from 'plugins/cordova-plugin-iotize-device-com-nfc';
 import { SessionState } from '@iotize/device-client.js/device';
 import { BLEComProtocol } from 'plugins/cordova-plugin-iotize-ble';
-import { Events, LoadingController } from '@ionic/angular';
+import { Events, LoadingController, ToastController } from '@ionic/angular';
 import { NFCTag } from './nfc.service';
 
 @Injectable({
@@ -22,7 +22,7 @@ export class TapService {
     return this.iotizeTap.sessionStateForceUpdate();
   }
 
-  constructor(public iotizeTap: IoTizeTap, public events: Events, public loading: LoadingController) { 
+  constructor(public iotizeTap: IoTizeTap, public events: Events, public loading: LoadingController, public toast: ToastController) { 
     this.events.subscribe('tag-discovered', (tag: NFCTag) => {
       if (!this.isReady) {
         this.NFCLoginAndBLEPairing(tag).then(() => {
@@ -113,9 +113,13 @@ export class TapService {
         loader.dismiss();
       } catch (err) {
         this.iotizeTap.isReady = false;
+        this.events.publish('closeNFC');
       console.error("Can't connect to TAP, try again" + JSON.stringify(err));
       console.error(err);
       loader.dismiss();
+      await this.disconnect();
+      const toast = await this.toast.create({message:"Can't connect to TAP, try again",position:"middle", showCloseButton:true});
+      toast.present();
       throw err;
       }
      

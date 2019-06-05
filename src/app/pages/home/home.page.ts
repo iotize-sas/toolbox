@@ -76,10 +76,14 @@ export class HomePage {
         } catch (secondError) {
           loader.dismiss();
           this.handleError(error);
+          await this.disconnect();
+          return;
         }
       }
       loader.dismiss();
       this.handleError(error);
+      await this.disconnect();
+      return;
     }
   }
 

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { NFC, NdefEvent } from '@ionic-native/nfc/ngx'
 import { Events } from '@ionic/angular';
 
+declare var nfc;
+
 export interface NFCTag{
   appName: string;
   macAddress: string;
@@ -18,7 +20,14 @@ export class NfcService {
   };
 
   constructor(public nfc: NFC,
-    public events: Events) { }
+    public events: Events) {
+      this.events.subscribe('NFCPairing', () => {
+        this.closeNFC();
+      })
+      this.events.subscribe('closeNFC', () => {
+        this.closeNFC();
+      })
+    }
 
   listenNFC() {
     this.nfc.addNdefListener(() => {
@@ -49,5 +58,9 @@ export class NfcService {
                 })
                 .reverse()
                 .join(':')
+  }
+
+  closeNFC() {
+    nfc.close();
   }
 }
