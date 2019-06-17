@@ -44,7 +44,7 @@ export class NfcService {
 
   onDiscoveredTap(event: NdefEvent) {
     let message = event.tag.ndefMessage;
-    this.lastTagRead.appName = String.fromCharCode(...message[3].payload);
+    this.lastTagRead.appName = String.fromCharCode(...message[3].payload.filter(byte => byte != 0));
     this.lastTagRead.macAddress = this.convertBytesToBLEAddress(message[2].payload);
   }
 

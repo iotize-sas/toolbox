@@ -165,12 +165,10 @@ export class HomePage {
   }
 
   nfcPairingSubscribe() {
-    this.events.subscribe('NFCPairing', (tag) => {
-      this.devices = [{
-        name: tag.appName,
-        address: tag.macAddress
-      }];
-
+    this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => {
+      if (this.devices.find(el => el.address == tag.address && el.name == tag.name) == undefined) {
+        this.devices.unshift(tag);
+      } 
     });
   }
 }

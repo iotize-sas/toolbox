@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from 'iotize-ng-com';
 import { Observable } from 'rxjs';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
+import { Events } from '@ionic/angular';
 
 export type AvailableCom = "BLE" | "NFC" | "WIFI";
 
@@ -13,7 +14,9 @@ export class ComService implements IoTizeComService {
   private selectedCom: AvailableCom = "BLE";
   public  selectedDevice?: DiscoveredDeviceType;
   
-  constructor(private ble: IoTizeBle) { }
+  constructor(private ble: IoTizeBle, public events: Events) {
+    this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => this.selectedDevice = tag);
+  }
   
   startScan(): Observable<DiscoveredDeviceType> {
     return this.getselectedComService().startScan();
