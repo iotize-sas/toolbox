@@ -89,10 +89,10 @@ export class TapService {
         await this.init(new NFCComProtocol());
         
         //enable NFC auto login
-        await this.tap.encryption(true);
+        await this.tap.encryption(true, true);
         
         //check the user login
-        let sessionState: SessionState = await this.tap.refreshSessionState()
+        let sessionState: SessionState = await this.tap.refreshSessionState();
         const nfcSessionStateString =  JSON.stringify(sessionState);
         console.log(`NFCLoginAndBLEPairing in NFC:  ` + nfcSessionStateString);
 
@@ -100,16 +100,17 @@ export class TapService {
         
         //connect to the device in BLE
         let bleCom : ComProtocol= new BLEComProtocol(tag.macAddress);
-  
         //start the BLE communication with the device
-        await this.tap.useComProtocol(bleCom);
-        await this.tap.connect();
+        await this.tap.useComProtocol(bleCom).connect();
         
         //check the connection
         sessionState = await this.tap.refreshSessionState();
         const bleSessionStateString = JSON.stringify(sessionState);
         console.log(`NFCLoginAndBLEPairing in BLE:  `+ bleSessionStateString);
-        this.events.publish('NFCPairing', tag);
+        this.events.publish('NFCPairing', {
+          name: tag.appName,
+          address: tag.macAddress
+        });
         loader.dismiss();
       } catch (err) {
         this.iotizeTap.isReady = false;

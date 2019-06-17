@@ -54,7 +54,7 @@ export class NfcService {
                   if (byte < 0) {
                     byte += 256;
                   }
-                  return byte.toString(16).toUpperCase();
+                  return ('0' + byte.toString(16).toUpperCase()).slice(-2);
                 })
                 .reverse()
                 .join(':')
