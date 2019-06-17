@@ -15,7 +15,7 @@
     </ion-toolbar>
   </ion-header>
   
-  <ion-content class="log" [scrollY]="true" #content>
+  <ion-content class="logger" [scrollY]="true" #content>
       <span *ngFor="let line of logLines" [class]="line.level">{{line.message}}</span>
   </ion-content>
   <ion-footer>

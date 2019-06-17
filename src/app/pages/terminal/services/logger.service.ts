@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 export interface Logline {
-  level: 'info' | 'error';
+  level: 'info' | 'error' | 'log';
   message: string;
 }
 
@@ -16,13 +16,13 @@ export class LoggerService {
 
   private logLines$: BehaviorSubject<Logline[]>;
   private logLines: Logline[] = [];
-  lastLogLevel?: 'info' | 'error';
+  lastLogLevel?: 'info' | 'error' | 'log';
 
   constructor() {
     this.logLines$ = new BehaviorSubject<Logline[]>([]);
   }
 
-  log(level: 'info' | 'error', string: string) {
+  log(level: 'info' | 'error' | 'log', string: string) {
     console[level](`[${level.toUpperCase()}] : ${string}`);
 
     if (level === 'error') {

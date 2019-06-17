@@ -29,16 +29,17 @@ export class TerminalService {
     public events: Events) {
   }
 
-  async send(data: Uint8Array) {
+  async send(data: string) {
     try {
       if (!this.tapService.isReady) {
         this.events.publish('disconnected');
         return;
       }
-      const response = (await this.tapService.tap.service.target.send(data));
+      const dataArray = this.stringToData(data);
+      const response = (await this.tapService.tap.service.target.send(dataArray));
       if (response.isSuccess()) {
         if (response.body().byteLength === 0) {
-          this.logger.log('info', 'sent: ');
+          this.logger.log('log', '\n> ' + data + '\n');
           await this.readAllTargetData();
           return; 
         }
@@ -56,11 +57,11 @@ export class TerminalService {
 
   sendInput() {
     if (!!this.input) {
-      this.sendString(this.input);
+      this.send(this.input);
     }
   }
 
-  sendString(textToSend: string) {
+  stringToData(textToSend: string) {
 
     let data: Uint8Array;
     let suffix = '';
@@ -82,7 +83,7 @@ export class TerminalService {
         break;
     }
     console.log(`sending: ${textToSend + suffix}`);
-    this.send(data);
+    return data;
   }
 
   async readAllTargetData() {
