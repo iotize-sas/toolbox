@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { DiscoveredDeviceType } from 'iotize-ng-com';
-import { ToastController, LoadingController, Events } from '@ionic/angular';
+import { ToastController, LoadingController, Events, Platform } from '@ionic/angular';
 import { ComService } from '../../services/com.service';
 import { Subscription } from 'rxjs';
 import { TapService } from 'src/app/services/tap.service';
@@ -18,10 +18,12 @@ export class HomePage {
     private changeDetector: ChangeDetectorRef,
     public loadingCtrl: LoadingController,
     public nfc: NfcService,
-    public events: Events) {
+    public events: Events,
+    public platform: Platform) {
     this.deviceArraySubscribe();
     this.nfc.listenNFC();
     this.nfcPairingSubscribe();
+    this.isIOS = this.platform.is("ios");
   }
 
   devices: DiscoveredDeviceType[] = [];
@@ -29,6 +31,7 @@ export class HomePage {
   private deviceArraySubscribe() {
     this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => this.devices = arr);
   }
+  isIOS: boolean;
   startScan() {
     this.comService.startScan().subscribe({ error: err => this.handleError(err) });
     // .subscribe(
@@ -170,5 +173,8 @@ export class HomePage {
         this.devices.unshift(tag);
       } 
     });
+  }
+  beginSession() {
+    this.nfc.nfc.beginSession();
   }
 }
