@@ -62,7 +62,9 @@ export class TapService {
     }
 
     disconnect(){
-      return this.iotizeTap.disconnect();
+      if (this.tap) {
+        return this.iotizeTap.disconnect();
+      }
     }
 
     get isReady() {
@@ -89,7 +91,7 @@ export class TapService {
         await this.init(new NFCComProtocol());
         
         //enable NFC auto login
-        await this.tap.encryption(true, true);
+        await this.tap.encryption(true);
         
         //check the user login
         let sessionState: SessionState = await this.tap.refreshSessionState();
@@ -118,7 +120,6 @@ export class TapService {
       console.error("Can't connect to TAP, try again" + JSON.stringify(err));
       console.error(err);
       loader.dismiss();
-      await this.disconnect();
       const toast = await this.toast.create({message:"Can't connect to TAP, try again",position:"middle", showCloseButton:true});
       toast.present();
       throw err;

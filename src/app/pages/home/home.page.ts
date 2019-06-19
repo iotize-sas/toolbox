@@ -130,6 +130,7 @@ export class HomePage {
   }
 
   private handleError(error: any) {
+    console.error('[HomePage]: ', error);
     let errorString = '';
     if (typeof error === "string") {
       errorString = error;
