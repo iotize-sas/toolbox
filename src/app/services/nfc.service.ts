@@ -40,6 +40,16 @@ export class NfcService {
         this.onDiscoveredTap(event);
         this.events.publish('tag-discovered', this.lastTagRead);
       });
+    this.nfc.addMimeTypeListener("application/com.iotize.toolbox",() => {
+      console.log('Mime listener ON')
+    },
+      (error) => {
+        console.error('Mime listener didn\'t start: ', error)
+      }).subscribe(event => {
+        console.log('Mime Event')
+        this.onDiscoveredTap(event);
+        this.events.publish('tag-discovered', this.lastTagRead);
+      });
   }
 
   onDiscoveredTap(event: NdefEvent) {
