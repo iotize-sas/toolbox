@@ -12,7 +12,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content scrollCatcher>
   <ion-refresher slot="fixed" (ionRefresh)="refreshDevices($event)" pullMin="120">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -30,7 +30,7 @@
   </ion-list>
 </ion-content>
 <ion-footer>
-  <ion-button *ngIf="!comService.isScanning" (click)="startScan()" expand="full">
+  <ion-button *ngIf="!comService.isScanning" (click)="refreshDevices()" expand="full">
     Start scan
   </ion-button>
   <ion-button *ngIf="comService.isScanning" (click)="stopScan()" expand="full">

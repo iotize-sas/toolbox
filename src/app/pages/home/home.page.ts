@@ -29,7 +29,11 @@ export class HomePage {
   devices: DiscoveredDeviceType[] = [];
   private deviceArraySubscription: Subscription;
   private deviceArraySubscribe() {
-    this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => this.devices = arr.sort((a,b) => b.rssi -a.rssi));
+    this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => {
+      this.devices = arr.sort((a, b) => b.rssi - a.rssi);
+      console.log('new deviceArray, detecting changes');
+      this.changeDetector.detectChanges();
+    });
   }
   isIOS: boolean;
   startScan() {
@@ -112,7 +116,7 @@ export class HomePage {
     this.deviceArraySubscribe();
   }
 
-  refreshDevices(event) {
+  refreshDevices(event?: any) {
     console.log("refreshing devices");
     try {
 
@@ -121,9 +125,13 @@ export class HomePage {
       }
       this.clear();
       this.startScan();
-      event.target.complete();
+      if (event) {
+        event.target.complete();
+      }
     } catch (error) {
-      event.target.complete();
+      if (event) {
+        event.target.complete();
+      }
       console.error(error);
       this.handleError(error);
     }
@@ -172,7 +180,7 @@ export class HomePage {
     this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => {
       if (this.devices.find(el => el.address == tag.address && el.name == tag.name) == undefined) {
         this.devices.unshift(tag);
-      } 
+      }
     });
   }
   beginSession() {
