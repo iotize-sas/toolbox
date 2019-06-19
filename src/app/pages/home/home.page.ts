@@ -29,7 +29,7 @@ export class HomePage {
   devices: DiscoveredDeviceType[] = [];
   private deviceArraySubscription: Subscription;
   private deviceArraySubscribe() {
-    this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => this.devices = arr);
+    this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => this.devices = arr.sort((a,b) => b.rssi -a.rssi));
   }
   isIOS: boolean;
   startScan() {

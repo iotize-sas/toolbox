@@ -41,6 +41,7 @@
 <ng-template #connectBlock let-device="device">
   <ion-item button color="light" (click)="connect(device)">
     {{device.name}}
+    <rssi slot="end" *ngIf="device.rssi" [bars]="device.rssi | rssiToBars"></rssi>
   </ion-item>
 </ng-template>
 <ng-template #disconnectBlock let-device="device">
