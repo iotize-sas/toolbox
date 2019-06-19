@@ -6,16 +6,6 @@
       <ion-title>
         Settings
       </ion-title>
-      <ion-buttons slot="end">
-        <ion-button *ngIf="!isLogged" (click)="openLoginAlert()">
-          <ion-icon slot="end" name="log-in"></ion-icon>
-          Login
-        </ion-button>
-        <ion-button *ngIf="isLogged" (click)="openLogoutAlert()">
-          <ion-icon slot="end" name="log-out"></ion-icon>
-          Logout
-        </ion-button>
-      </ion-buttons>
     </ion-toolbar>
   </ion-header>
   <ion-content>

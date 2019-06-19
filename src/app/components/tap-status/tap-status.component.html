@@ -1,7 +1,12 @@
-<p>
-  {{appName | uppercase}}
-</p>
-<p>
-  <ion-icon name="person"></ion-icon>{{userName}}
-</p>
-<!-- <app-login [displayText]="true"></app-login> -->
+<div *ngIf="appName">
+  <p>
+    {{appName | uppercase}}
+  </p>
+  <p>
+    <ion-icon name="person"></ion-icon>{{userName}}
+  </p>
+  <ion-button *ngIf="userName == 'anonymous' || userName == ''" (click)="openLoginAlert()" expand="block">LOGIN
+  </ion-button>
+  <ion-button *ngIf="userName != 'anonymous' && userName != ''" (click)="openLogoutAlert()" expand="block">LOGOUT
+  </ion-button>
+</div>
