@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit, OnDestroy{
 
   @Input() displayText: boolean;
 
-  private isLogged = false;
+  isLogged = false;
   private sessionSubscription: Subscription;
 
   constructor(public toastController: ToastController,
