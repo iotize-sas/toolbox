@@ -6,6 +6,9 @@
     <ion-title>
       Home
     </ion-title>
+    <ion-buttons slot="end" *ngIf="isIOS" (click)="beginSession()">
+      <img src="assert/nfc-logo-icon-18-49.png" alt="NFC" class="nfcLogo">
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -38,6 +41,7 @@
 <ng-template #connectBlock let-device="device">
   <ion-item button color="light" (click)="connect(device)">
     {{device.name}}
+    <rssi slot="end" *ngIf="device.rssi" [bars]="device.rssi | rssiToBars"></rssi>
   </ion-item>
 </ng-template>
 <ng-template #disconnectBlock let-device="device">

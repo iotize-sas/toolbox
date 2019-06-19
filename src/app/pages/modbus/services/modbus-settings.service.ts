@@ -72,7 +72,7 @@ export class ModbusSettingsService {
         return;
       } else {
         if (response.codeRet() == ResultCode.IOTIZE_401_UNAUTHORIZED) {
-          throw ResultCode.IOTIZE_401_UNAUTHORIZED;
+          throw ResultCodeTranslation[ResultCode.IOTIZE_401_UNAUTHORIZED];
         }
         throw new Error('setUARTSettings response failed');
       }
@@ -248,8 +248,7 @@ if (!triedReconnection){
         console.log(`Returned Code: ${ResultCodeTranslation[response.codeRet()]}`)
         resolve(response.isSuccessful() || response.codeRet() != ResultCode.IOTIZE_TARGET_PROTOCOL_LOST_COM);
       } catch (error) {
-          console.error('[modbusReadWithTimeout] ERROR');
-          console.error(error);
+          console.error('[modbusReadWithTimeout] ERROR', error);
           resolve(false);
         }
     });

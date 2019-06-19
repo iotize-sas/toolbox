@@ -1,15 +1,28 @@
-import { Component, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, ChangeDetectorRef, Input, OnInit, OnDestroy } from '@angular/core';
 import { ToastController, AlertController, LoadingController } from '@ionic/angular';
 import { TapService } from 'src/app/services/tap.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy{
+
+  ngOnInit() {
+    this.sessionSubscription = this.tapService.sessionState().subscribe(val => this.isLogged = val.name !== 'anonymous');
+  }
+
+  ngOnDestroy(){
+    this.sessionSubscription.unsubscribe();
+    this.sessionSubscription = null;
+  }
 
   @Input() displayText: boolean;
+
+  private isLogged = false;
+  private sessionSubscription: Subscription;
 
   constructor(public toastController: ToastController,
               public alertCtrl: AlertController,

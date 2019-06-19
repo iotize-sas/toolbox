@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ScrollTableModule } from './scroll-table/scroll-table.module';
 import { LoginModule } from './login/login.module';
+import { TapStatusModule } from './tap-status/tap-status.module';
+import { RssiModule } from './rssi/rssi.module';
 
 @NgModule({
     imports: [
@@ -11,11 +13,15 @@ import { LoginModule } from './login/login.module';
         CommonModule,
         FormsModule,
         ScrollTableModule,
-        LoginModule
+        LoginModule,
+        TapStatusModule,
+        RssiModule
     ],
     exports: [
         ScrollTableModule,
-        LoginModule
+        LoginModule,
+        TapStatusModule,
+        RssiModule 
     ]
   })
   export class ComponentsModule {}

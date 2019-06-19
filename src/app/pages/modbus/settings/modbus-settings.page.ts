@@ -94,13 +94,38 @@ export class ModbusSettingsPage {
     this.keyboard.hide();
   }
 
-  async detectBaudRate() {
-    try {
+  async autoBaudRate() {
+    const confirm = await this.alertCtrl.create({
+      header: 'AutoBaud',
+      message: 'Do you want to scan for correct baudrate?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.detectBaudRate();
+          }
+        },
+      ]
+    });
+    await confirm.present();
+  }
 
+  async detectBaudRate() {
+    const loader = await this.loadingCtrl.create({message: 'Searching for baudrate' });
+    loader.present();
+    try {
       const validatedSettings = await this.settings.autoDetectBaudRate();
       console.log(validatedSettings);
+      loader.dismiss();
       this.showClosingToast(`Found modbus settings`);
     } catch (error) {
+      loader.dismiss();
       this.showClosingToast(`${error.message? error.message : error}`);
     }
   }

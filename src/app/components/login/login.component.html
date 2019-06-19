@@ -1,8 +1,8 @@
-<ion-button *ngIf="!!tapService.session && tapService.session.name == 'anonymous' " (click)="openLoginAlert()">
+<ion-button *ngIf="!!tapService.session && !isLogged " (click)="openLoginAlert()">
   <ion-icon slot="end" name="log-in"></ion-icon>
   {{displayText? 'Login': ''}}
 </ion-button>
-<ion-button *ngIf="!!tapService.session && tapService.session.name != 'anonymous' " (click)="openLogoutAlert()">
+<ion-button *ngIf="!!tapService.session && isLogged " (click)="openLogoutAlert()">
   <ion-icon slot="end" name="log-out"></ion-icon>
   {{displayText? 'Logout': ''}}
 </ion-button>

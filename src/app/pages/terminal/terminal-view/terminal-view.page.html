@@ -1,5 +1,8 @@
 <ion-header>
     <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+          </ion-buttons>
       <ion-title>Terminal</ion-title>
       <ion-buttons slot="start">
         <ion-button (click)="clear()">Clear</ion-button>
@@ -12,7 +15,7 @@
     </ion-toolbar>
   </ion-header>
   
-  <ion-content class="log" [scrollY]="true" #content>
+  <ion-content class="logger" [scrollY]="true" #content>
       <span *ngFor="let line of logLines" [class]="line.level">{{line.message}}</span>
   </ion-content>
   <ion-footer>

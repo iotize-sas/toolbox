@@ -1,9 +1,10 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
-import { IoTizeTap, DiscoveredDeviceType } from 'iotize-ng-com';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { DiscoveredDeviceType } from 'iotize-ng-com';
+import { ToastController, LoadingController, Events, Platform } from '@ionic/angular';
 import { ComService } from '../../services/com.service';
 import { Subscription } from 'rxjs';
 import { TapService } from 'src/app/services/tap.service';
+import { NfcService } from 'src/app/services/nfc.service';
 
 @Component({
   selector: 'app-home',
@@ -15,17 +16,24 @@ export class HomePage {
     public tapService: TapService,
     private toast: ToastController,
     private changeDetector: ChangeDetectorRef,
-    public loadingCtrl: LoadingController) {
-      this.deviceArraySubscribe();
-    }
+    public loadingCtrl: LoadingController,
+    public nfc: NfcService,
+    public events: Events,
+    public platform: Platform) {
+    this.deviceArraySubscribe();
+    this.nfc.listenNFC();
+    this.nfcPairingSubscribe();
+    this.isIOS = this.platform.is("ios");
+  }
 
   devices: DiscoveredDeviceType[] = [];
   private deviceArraySubscription: Subscription;
   private deviceArraySubscribe() {
-    this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => this.devices = arr);
+    this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => this.devices = arr.sort((a,b) => b.rssi -a.rssi));
   }
+  isIOS: boolean;
   startScan() {
-    this.comService.startScan().subscribe({error: err => this.handleError(err)});
+    this.comService.startScan().subscribe({ error: err => this.handleError(err) });
     // .subscribe(
     //   device => {
     //     console.log(device);
@@ -50,29 +58,36 @@ export class HomePage {
 
     loader.present();
 
-     const connectionProtocol = this.comService.getProtocol(device);
-     try {
-       await this.tapService.init(connectionProtocol);
-       loader.dismiss();
-       this.showToast('Connected to ' + device.name);
-       this.changeDetector.detectChanges();
-      } catch (error) {
-        if (error.code == "ConnectionError") {
-          //retry once to connect
-          loader.message = 'Connecting to ' + device.name + ' second attempt';
-          try {
-            await this.tapService.init(connectionProtocol);
-            loader.dismiss();
-            this.showToast('Connected to ' + device.name);
-            this.changeDetector.detectChanges();
-          } catch (secondError) {
-            loader.dismiss();
-            this.handleError(error);
-          }
-       }
-       loader.dismiss();
-       this.handleError(error);
-     }
+    const connectionProtocol = this.comService.getProtocol(device);
+    try {
+      await this.tapService.init(connectionProtocol);
+      loader.dismiss();
+      this.events.publish('connected');
+      this.showToast('Connected to ' + device.name);
+      this.changeDetector.detectChanges();
+    } catch (error) {
+      if (error.code == "ConnectionError") {
+        //retry once to connect
+        loader.message = 'Connecting to ' + device.name + ' second attempt';
+        try {
+          await this.tapService.init(connectionProtocol);
+          loader.dismiss();
+          this.events.publish('connected');
+          this.showToast('Connected to ' + device.name);
+          this.changeDetector.detectChanges();
+          return;
+        } catch (secondError) {
+          loader.dismiss();
+          this.handleError(error);
+          await this.disconnect();
+          return;
+        }
+      }
+      loader.dismiss();
+      this.handleError(error);
+      await this.disconnect();
+      return;
+    }
   }
 
   async disconnect() {
@@ -96,7 +111,7 @@ export class HomePage {
     this.comService.clearDevices();
     this.deviceArraySubscribe();
   }
-  
+
   refreshDevices(event) {
     console.log("refreshing devices");
     try {
@@ -107,7 +122,7 @@ export class HomePage {
       this.clear();
       this.startScan();
       event.target.complete();
-    } catch(error) {
+    } catch (error) {
       event.target.complete();
       console.error(error);
       this.handleError(error);
@@ -144,11 +159,22 @@ export class HomePage {
     toast.present();
   }
 
-  isConnected(device:DiscoveredDeviceType) {
+  isConnected(device: DiscoveredDeviceType) {
     let isConnected = false;
     if (this.tapService.isReady && this.comService.selectedDevice) {
       isConnected = device.address == this.comService.selectedDevice.address
     }
     return isConnected;
+  }
+
+  nfcPairingSubscribe() {
+    this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => {
+      if (this.devices.find(el => el.address == tag.address && el.name == tag.name) == undefined) {
+        this.devices.unshift(tag);
+      } 
+    });
+  }
+  beginSession() {
+    this.nfc.nfc.beginSession();
   }
 }
