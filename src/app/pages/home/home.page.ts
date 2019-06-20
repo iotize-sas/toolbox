@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { DiscoveredDeviceType } from 'iotize-ng-com';
 import { ToastController, LoadingController, Events, Platform } from '@ionic/angular';
 import { ComService } from '../../services/com.service';
@@ -11,7 +11,7 @@ import { NfcService } from 'src/app/services/nfc.service';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage {
+export class HomePage implements OnInit{
   constructor(public comService: ComService,
     public tapService: TapService,
     private toast: ToastController,
@@ -20,6 +20,9 @@ export class HomePage {
     public nfc: NfcService,
     public events: Events,
     public platform: Platform) {
+  }
+
+  ngOnInit() {
     this.deviceArraySubscribe();
     this.nfc.listenNFC();
     this.nfcPairingSubscribe();

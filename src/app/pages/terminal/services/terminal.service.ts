@@ -1,13 +1,12 @@
 import { FormatHelper } from '@iotize/device-client.js/core';
-import { SettingsService } from './settings.service';
 import { LoggerService } from './logger.service';
 import { Injectable } from '@angular/core';
 import { interval, Observable, Subscription } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import { ResultCodeTranslation, ResultCode, Response } from '@iotize/device-client.js/client/api/response';
-import { IoTizeTap } from 'iotize-ng-com';
 import { Events } from '@ionic/angular';
 import { TapService } from 'src/app/services/tap.service';
+import { SettingsService } from 'src/app/services/settings.service';
 
 @Injectable({
   providedIn: 'root'
