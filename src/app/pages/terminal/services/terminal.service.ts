@@ -39,7 +39,7 @@ export class TerminalService {
       const response = (await this.tapService.tap.service.target.send(dataArray));
       if (response.isSuccess()) {
         if (response.body().byteLength === 0) {
-          this.logger.log('log', '\n> ' + data + '\n');
+          this.logger.log('log', '\n' + data + '\n');
           await this.readAllTargetData();
           return; 
         }
