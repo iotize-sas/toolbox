@@ -1,10 +1,8 @@
-// import { DeviceService } from './';
 import { LoggerService } from './logger.service';
 import { Injectable } from '@angular/core';
 import { UartSettings } from '@iotize/device-client.js/device/model';
 import { Events } from '@ionic/angular';
 import { ResultCodeTranslation, ResultCode } from '@iotize/device-client.js/client/api/response';
-import { IoTizeTap } from 'iotize-ng-com';
 import { TapService } from 'src/app/services/tap.service';
 
 @Injectable({

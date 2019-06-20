@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { SettingsGuard } from './settings.guard';
 
 const routes: Routes = [
   {
@@ -11,14 +12,19 @@ const routes: Routes = [
     path: 'home',
     loadChildren: './pages/home/home.module#HomePageModule'
   },
-  { 
+  {
     path: 'terminal',
     loadChildren: './pages/terminal/terminal.module#TerminalPageModule'
   },
   {
     path: 'modbus',
     loadChildren: './pages/modbus/modbus.module#ModbusPageModule'
+  },
+  {
+    path: 'settings',
+    loadChildren: './pages/settings/settings.module#SettingsPageModule'
   }
+
 ];
 
 @NgModule({
@@ -27,4 +33,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
