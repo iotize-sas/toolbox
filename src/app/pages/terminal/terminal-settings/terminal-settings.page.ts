@@ -1,4 +1,4 @@
-import { SettingsService } from '../services/settings.service';
+import { SettingsService } from '../../../services/settings.service';
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { TerminalService } from '../services/terminal.service';
