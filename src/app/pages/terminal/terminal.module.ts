@@ -5,18 +5,19 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { TerminalPage } from './terminal.page';
-import { TerminalPageRoutingModule } from './terminal.router.module';
 import { TerminalViewPageModule } from './terminal-view/terminal-view.module';
-import { TerminalSettingsPageModule } from './terminal-settings/terminal-settings.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    TerminalPageRoutingModule,
-    TerminalViewPageModule,
-    TerminalSettingsPageModule
+    RouterModule.forChild([{
+      path: '',
+      component: TerminalPage
+    }]),
+    TerminalViewPageModule
   ],
   declarations: [TerminalPage]
 })

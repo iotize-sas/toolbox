@@ -118,6 +118,10 @@ export class TerminalService {
   }
 
   launchReadingTask() {
+    if (this.readingTaskOn) {
+      console.log('Reading task already running');
+      return;
+    }
     this.readingTaskOn = true;
     console.log('creating reading task observable');
     this.timer = interval(this.refreshTime).pipe(takeWhile(() => this.readingTaskOn));
