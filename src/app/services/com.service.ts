@@ -31,7 +31,17 @@ export class ComService implements IoTizeComService {
     if (device.name) {
       this.selectedDevice = device as DiscoveredDeviceType;
     }
-    const protocol = this.getselectedComService().getProtocol(device);
+    const protocol = this.getselectedComService().getProtocol(device, {
+      connect :{
+        timeout: 60000
+      },
+      disconnect :{
+        timeout: 60000
+      },
+      send :{
+        timeout: 600000
+      },
+    });
     return protocol;
   }
 

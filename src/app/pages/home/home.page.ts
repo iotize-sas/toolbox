@@ -107,10 +107,14 @@ export class HomePage implements OnInit{
     try {
       await this.tapService.disconnect();
     } catch (error) {
-      this.showError(error);
+      if (error) {
+        this.showError(error);
+      }
     }
     loader.dismiss();
     this.comService.selectedDevice = null;
+    this.events.publish('disconnected');
+    this.changeDetector.detectChanges();
   }
 
   clear() {
