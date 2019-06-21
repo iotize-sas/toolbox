@@ -39,9 +39,14 @@ export class TapService {
       try {
         await this.iotizeTap.init(comProtocol);
       } catch (err) {
-        console.error("[TapService]: init failed");
-        console.error(err);
-        throw err;
+        //retry
+        try {
+          await this.iotizeTap.init(comProtocol);
+        } catch(err){
+          console.error("[TapService]: init failed");
+          console.error(err);
+          throw err;
+        }
       }
       // Disconnect from target, check for current protocol and connect if Modbus or Serial is available
       try {
