@@ -1,16 +1,18 @@
 <ion-header>
   <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
     <ion-title>
       Settings
     </ion-title>
     <ion-buttons slot="end">
-        <app-login [displayText]="true"></app-login>
       </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
+  <ion-list *ngIf="settings.didFetchSettings">
     <ion-list-header>
       <ion-label>
         Communication settings
@@ -77,17 +79,17 @@
         </ion-select-option>
       </ion-select>
     </ion-item>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-button (click)="changeSettings()">Apply settings</ion-button>
-      </ion-buttons>
-      <ion-buttons slot="end">
-        <ion-button (click)="readSettingsFromTap()">Read from tap</ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-    <ion-toolbar>
-      <!-- <ion-button (click)="detectBaudRate()" expand="block" fill="clear">AutoBaud</ion-button> -->
-    </ion-toolbar>
   </ion-list>
-
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="changeSettings()">Apply settings</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="readSettingsFromTap()">Read from tap</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar class="margin-top">
+      <ion-button (click)="autoBaudRate()" expand="block" fill="clear">AutoBaud</ion-button>
+    </ion-toolbar>
+  
 </ion-content>

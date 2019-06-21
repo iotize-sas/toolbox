@@ -5,14 +5,15 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ModbusSettingsPage } from './modbus-settings.page';
+import { SettingsPage } from './settings.page';
 import { PipeModule } from 'src/app/pipes/pipes.modules';
-import { ComponentsModule } from 'src/app/components/components.module';
+import { SettingsGuard } from 'src/app/settings.guard';
 
 const routes: Routes = [
   {
     path: '',
-    component: ModbusSettingsPage
+    component: SettingsPage,
+    canDeactivate: [SettingsGuard]
   }
 ];
 
@@ -21,10 +22,10 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes),
     PipeModule,
-    ComponentsModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [ModbusSettingsPage]
+  providers: [SettingsGuard],
+  declarations: [SettingsPage]
 })
-export class ModbusSettingsPageModule {}
+export class SettingsPageModule {}

@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { UartSettings, ModbusOptions, VariableFormat } from '@iotize/device-client.js/device/model';
-import { LoggerService } from '../../terminal/services/logger.service';
+import { TapService } from './tap.service';
 import { Events } from '@ionic/angular';
-import { IoTizeTap } from 'iotize-ng-com';
-import { ResultCodeTranslation, ResultCode } from '@iotize/device-client.js/client/api/response';
-import { TapService } from 'src/app/services/tap.service';
+import { ResultCode, ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ModbusSettingsService {
+export class SettingsService {
+
   public BAUD_RATES: Array<number> = [300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200,
     187500, 230400, 460800, 921600];
 
@@ -17,41 +16,32 @@ export class ModbusSettingsService {
   _settings: UartSettings; // real settings
   settings: UartSettings; // displayed settings
 
-  constructor(public logger: LoggerService,
-    public deviceService: TapService,
+  stopAutoBaud = false;
+
+  constructor(
+    public tapService: TapService,
     public events: Events) {
-    this._settings = {
-      physicalPort: UartSettings.PhysicalPort.USB,
-      stopBit: UartSettings.StopBit.ONE,
-      bitParity: UartSettings.BitParity.NONE,
-      dataBitsLength: UartSettings.DataBitsLength._7,
-      handshakeValue: UartSettings.Handshake.NONE,
-      handshakeDelimiter: UartSettings.HandshakeDelimiter.NONE,
-      timeout: 50,
-      baudRate: 187500,
-      ofs: false,
-      slv: 0
-    };
-    this.settings = Object.assign({}, this._settings);
     this.eventSubscribe();
   }
 
   async getUARTSettings(): Promise<void> {
     try {
-      const response = await this.deviceService.tap.service.target.getUARTSettings();
+      const response = await this.tapService.tap.service.target.getUARTSettings();
 
       if (response.isSuccess()) {
         this._settings = response.body();
-        console.log(this._settings);
         this.settings = Object.assign({}, this._settings);
         this.didFetchSettings = true;
         return;
       }
-      this.didFetchSettings = false;
-      throw new Error('getUARTSettings response failed');
+      if (response.codeRet() === ResultCode.IOTIZE_401_UNAUTHORIZED) {
+        this.didFetchSettings = false;
+        await this.tapService.sessionStateForceUpdate();
+        throw new Error('Login required');
+      }
+      throw new Error('getUARTSettings response failed: ' + ResultCodeTranslation[response.codeRet()]);
 
     } catch (error) {
-      this.didFetchSettings = false;
       throw error;
     }
   }
@@ -59,20 +49,21 @@ export class ModbusSettingsService {
   async setUARTSettings(): Promise<void> {
     return this._setUARTSettings(true);
   }
+
   private async _setUARTSettings(firstTry: boolean, triedReconnection = false): Promise<void> {
     try {
       console.log('>>>>>>> waiting after disconnect');
-      await this.deviceService.tap.service.target.disconnect();
+      await this.tapService.tap.service.target.disconnect();
 
       console.log('>>>>>>> setUARTSettings');
-      const response = await this.deviceService.tap.service.target.setUARTSettings(this._settings);
+      const response = await this.tapService.tap.service.target.setUARTSettings(this._settings);
       if (response.isSuccess()) {
         console.log('>>>>>>> connecting');
-        await this.deviceService.tap.service.target.connect();
+        await this.tapService.tap.service.target.connect();
         return;
       } else {
         if (response.codeRet() == ResultCode.IOTIZE_401_UNAUTHORIZED) {
-          throw ResultCode.IOTIZE_401_UNAUTHORIZED;
+          throw ResultCodeTranslation[ResultCode.IOTIZE_401_UNAUTHORIZED];
         }
         throw new Error('setUARTSettings response failed');
       }
@@ -90,7 +81,6 @@ if (!triedReconnection){
         console.error(handleDisconnectionError);
       }}
       
-      this.logger.log('error', error);
       throw (error);
     }
   }
@@ -144,13 +134,16 @@ if (!triedReconnection){
   }
 
   async applyChanges() {
-    // REAL IMPLEMENTATION
+    const initialSettings = Object.assign({}, this._settings);
     try {
       this._settings = Object.assign({}, this.settings);
       await this.setUARTSettings();
+      this.events.publish('needChangeDetection');
     } catch (error) {
-      this.logger.log('error', error);
-      throw error;
+      this._settings = Object.assign({}, initialSettings);
+      this.getUARTSettings();
+      this.events.publish('needChangeDetection');
+      throw (error);
     }
   }
 
@@ -169,17 +162,32 @@ if (!triedReconnection){
   }
 
   eventSubscribe() {
-    this.events.subscribe('connected', () => this.getUARTSettings());
+    this.events.subscribe('connected', () => this.getUARTSettings().catch(error => this.events.publish('error-message', error.message)));
+    this.events.subscribe('logged-in', () => {
+      if (!this.didFetchSettings) {
+        this.getUARTSettings().catch(error => this.events.publish('error-message', error.message))
+      }
+    });
+    this.events.subscribe('disconnected', () => this.didFetchSettings = false);
   }
 
+  async handleDisconnection() {
+    const isConnected = this.tapService.tap.isConnected();
+    console.log(`Device is ${isConnected? '' : 'not'} connected`);
+    if (!isConnected) {
+      await this.tapService.tap.connect();
+    }
+  }
 
   async autoDetectBaudRate() {
+    this.stopAutoBaud = false;
     const originalTimeOut = this.settings.timeout;
+    this.settings.timeout = 20;
     let isValidBaudRate = false;
     for (let rate of this.BAUD_RATES) {
       console.log(`testing ${rate}`);
       isValidBaudRate = await this.testOneBaudRate(rate);
-        if (isValidBaudRate) {
+        if (isValidBaudRate || this.stopAutoBaud) {
         break;
       }
     }
@@ -188,6 +196,7 @@ if (!triedReconnection){
     if (isValidBaudRate) {
       return this.settings;
     }
+    this.settings.timeout = originalTimeOut;
     throw new Error('Couldn\'t find baudRate');
   }
 
@@ -197,50 +206,36 @@ if (!triedReconnection){
     console.log(`Setting UART with ${rate} bps, parity NONE`);
     await this.applyChanges();
     let isValidConfig = await this.modbusReadWithTimeout();
-    if (isValidConfig) {
-      return true;
+    if (isValidConfig || this.stopAutoBaud) {
+      return isValidConfig;
     }
     this.settings.bitParity = UartSettings.BitParity.ODD;
     console.log(`Setting UART with ${rate} bps, parity ODD`);
     await this.applyChanges();
     isValidConfig = await this.modbusReadWithTimeout();
-    if (isValidConfig) {
-      return true;
+    if (isValidConfig || this.stopAutoBaud) {
+      return isValidConfig;
     }
     this.settings.bitParity = UartSettings.BitParity.EVEN;
     console.log(`Setting UART with ${rate} bps, parity EVEN`);
     await this.applyChanges();
     isValidConfig = await this.modbusReadWithTimeout();
-    if (isValidConfig) {
-      return true;
+    if (isValidConfig || this.stopAutoBaud) {
+      return isValidConfig;
     }
     return false;
 
   }
 
-  modbusReadWithTimeout(timeout: number = 1000): Promise<boolean> {
+  modbusReadWithTimeout(timeout: number = 500): Promise<boolean> {
     let _this = this;
     return new Promise(async function(resolve) {
-      // setTimeout(() => {resolve(false)}, timeout);
-      // try {
-      //   await this.deviceService.tap.service.target.modbusRead({
-      //     objectType: ModbusOptions.ObjectType.DEFAULT,
-      //     address: 320,
-      //     format: VariableFormat._1_BIT,
-      //     length: 1,
-      //     slave: 1
-      //   });
-      //   resolve(true);
-      // } catch (error) {
-      //   console.error('[modbusReadWithTimeout] ERROR');
-      //   console.error(error);
-      //   resolve(false);
-      // }
+
       try {
 
-        const response = await _this.deviceService.tap.service.target.modbusRead({
+        const response = await _this.tapService.tap.service.target.modbusRead({
           objectType: ModbusOptions.ObjectType.DEFAULT,
-          address: 0,
+          address: 1,
           format: VariableFormat._16_BITS,
           length: 1,
           slave: 1
@@ -248,17 +243,10 @@ if (!triedReconnection){
         console.log(`Returned Code: ${ResultCodeTranslation[response.codeRet()]}`)
         resolve(response.isSuccessful() || response.codeRet() != ResultCode.IOTIZE_TARGET_PROTOCOL_LOST_COM);
       } catch (error) {
-          console.error('[modbusReadWithTimeout] ERROR');
-          console.error(error);
+          console.error('[modbusReadWithTimeout] ERROR', error);
           resolve(false);
         }
     });
   }
-  async handleDisconnection() {
-    const isConnected = this.deviceService.tap.isConnected();
-    console.log(`Device is ${isConnected? '' : 'not'} connected`);
-    // if (!isConnected) {
-      await this.deviceService.tap.connect();
-    // }
-  }
+
 }

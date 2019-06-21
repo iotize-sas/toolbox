@@ -12,34 +12,49 @@
   <ion-list>
     <ion-item>
       <ion-label>Slave</ion-label>
-      <ion-input type="number" min="0" [(ngModel)]="slave" class="right-align" (keyup.enter)="closeKeyboard()" clearInput>
-        </ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>Register</ion-label>
-          <ion-input type="number" min="0" [(ngModel)]="address" class="right-align" (keyup.enter)="closeKeyboard()" clearInput>
-            </ion-input>
+      <ion-input type="number" min="0" [(ngModel)]="slave" class="right-align" (keyup.enter)="closeKeyboard()"
+        clearInput>
+      </ion-input>
+    </ion-item>
+    <ion-item [color]="isRegisterValidHexString? '':'danger'">
+      <ion-label>Register</ion-label>
+      <ion-input *ngIf="registerMode == 'DEC'" type="number" min="0" [(ngModel)]="address" class="right-align"
+        (keyup.enter)="closeKeyboard()" clearInput>
+      </ion-input>
+      <ion-input *ngIf="registerMode == 'HEX'" type="text" maxlength="8" [(ngModel)]="hexAddress" class="right-align"
+        (keyup.enter)="closeKeyboard()" clearInput>
+      </ion-input>
     </ion-item>
     <ion-item>
       <ion-label>Type</ion-label>
       <ion-select [(ngModel)]="objectType">
-        <ion-select-option *ngFor="let option of ModbusOptions.ObjectType | enum" [(value)]="option.index">{{option.value}}</ion-select-option>
+        <ion-select-option *ngFor="let option of ModbusOptions.ObjectType | enum" [(value)]="option.index">
+          {{option.value}}</ion-select-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Format</ion-label>
       <ion-select [(ngModel)]="format" [disabled]="!canChangeFormat">
-        <ion-select-option *ngFor="let option of VariableFormat | enum" [(value)]="option.index">{{option.value | trim: '_'}}</ion-select-option>
+        <ion-select-option *ngFor="let option of VariableFormat | enum" [(value)]="option.index">
+          {{option.value | trim: '_'}}</ion-select-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Length</ion-label>
-        <ion-input type="number" min="1" step="1" [(ngModel)]="dataLength" class="right-align" (keyup.enter)="closeKeyboard()" clearInput required>
-        </ion-input>
+      <ion-input type="number" min="1" step="1" [(ngModel)]="dataLength" class="right-align"
+        (keyup.enter)="closeKeyboard()" clearInput required>
+      </ion-input>
     </ion-item>
     <ion-item>
-      <ion-label>Display mode</ion-label>
+      <ion-label>Value displayed as</ion-label>
       <ion-select [(ngModel)]="displayMode">
+        <ion-select-option value="HEX">HEX</ion-select-option>
+        <ion-select-option value="DEC">DEC</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Register displayed as</ion-label>
+      <ion-select [(ngModel)]="registerMode">
         <ion-select-option value="HEX">HEX</ion-select-option>
         <ion-select-option value="DEC">DEC</ion-select-option>
       </ion-select>

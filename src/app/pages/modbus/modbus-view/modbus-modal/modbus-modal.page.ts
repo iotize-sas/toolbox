@@ -15,12 +15,14 @@ export class ModbusModalPage implements OnInit {
               public modal: ModalController,
               private keyboard: Keyboard) { }
 
+  isRegisterValidHexString = true;
   slave: number;
   address: number;
   _objectType: ModbusOptions.ObjectType;
   _format: VariableFormat;
   length: number;
   displayMode: 'HEX' | 'DEC';
+  registerMode: 'HEX' | 'DEC';
 
   get dataLength() {
     return this.length;
@@ -69,6 +71,20 @@ export class ModbusModalPage implements OnInit {
     return this._objectType !== ModbusOptions.ObjectType.COIL && this._objectType !== ModbusOptions.ObjectType.DISCRET_INPUT;
   }
 
+  get hexAddress() {
+    return this.address.toString(16).toUpperCase();
+  }
+
+  set hexAddress(value: string) {
+    const regExpHexString = /^([A-Fa-f0-9])+$/;
+    if(regExpHexString.test(value)) {
+      this.address = + ('0x' + value);
+      this.isRegisterValidHexString = true;
+    } else {
+      this.isRegisterValidHexString = false;
+    }
+  }
+
   getSavedOptions() {
     this.slave = this.modbus.modbusOptions.slave;
     this.address = this.modbus.modbusOptions.address;
@@ -76,6 +92,7 @@ export class ModbusModalPage implements OnInit {
     this._format = this.modbus.modbusOptions.format;
     this.length = this.modbus.modbusOptions.length;
     this.displayMode = this.modbus.displayMode;
+    this.registerMode = this.modbus.registerMode;
   }
 
   saveOptions() {
@@ -85,6 +102,7 @@ export class ModbusModalPage implements OnInit {
     this.modbus.modbusOptions.format = this._format;
     this.modbus.modbusOptions.length = this.length;
     this.modbus.displayMode = this.displayMode;
+    this.modbus.registerMode = this.registerMode;
   }
 
   saveAndDismiss() {

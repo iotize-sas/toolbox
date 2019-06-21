@@ -1,5 +1,4 @@
 import { FormatHelper } from '@iotize/device-client.js/core';
-import { SettingsService } from './settings.service';
 import { LoggerService } from './logger.service';
 import { Injectable } from '@angular/core';
 import { interval, Observable, Subscription } from 'rxjs';
@@ -7,6 +6,7 @@ import { takeWhile } from 'rxjs/operators';
 import { ResultCodeTranslation, ResultCode, Response } from '@iotize/device-client.js/client/api/response';
 import { Events } from '@ionic/angular';
 import { TapService } from 'src/app/services/tap.service';
+import { SettingsService } from 'src/app/services/settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,16 +28,17 @@ export class TerminalService {
     public events: Events) {
   }
 
-  async send(data: Uint8Array) {
+  async send(data: string) {
     try {
       if (!this.tapService.isReady) {
         this.events.publish('disconnected');
         return;
       }
-      const response = (await this.tapService.tap.service.target.send(data));
+      const dataArray = this.stringToData(data);
+      const response = (await this.tapService.tap.service.target.send(dataArray));
       if (response.isSuccess()) {
         if (response.body().byteLength === 0) {
-          this.logger.log('info', 'sent: ');
+          this.logger.log('log', '\n' + data + '\n');
           await this.readAllTargetData();
           return; 
         }
@@ -55,11 +56,11 @@ export class TerminalService {
 
   sendInput() {
     if (!!this.input) {
-      this.sendString(this.input);
+      this.send(this.input);
     }
   }
 
-  sendString(textToSend: string) {
+  stringToData(textToSend: string) {
 
     let data: Uint8Array;
     let suffix = '';
@@ -81,11 +82,15 @@ export class TerminalService {
         break;
     }
     console.log(`sending: ${textToSend + suffix}`);
-    this.send(data);
+    return data;
   }
 
   async readAllTargetData() {
     this.readingData = true;
+    if (!this.tapService.tap) {
+      console.warn('No connected tap');
+      return;
+    }
     try {
       const response = (await this.tapService.tap.service.target.readBytes());
       if (response.isSuccessful()) {
@@ -117,6 +122,10 @@ export class TerminalService {
   }
 
   launchReadingTask() {
+    if (this.readingTaskOn) {
+      console.log('Reading task already running');
+      return;
+    }
     this.readingTaskOn = true;
     console.log('creating reading task observable');
     this.timer = interval(this.refreshTime).pipe(takeWhile(() => this.readingTaskOn));

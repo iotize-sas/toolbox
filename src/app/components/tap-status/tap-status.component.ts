@@ -1,21 +1,39 @@
-import { Component, ChangeDetectorRef, Input } from '@angular/core';
-import { ToastController, AlertController, LoadingController } from '@ionic/angular';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { TapService } from 'src/app/services/tap.service';
+import { Events, AlertController, LoadingController, ToastController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+  selector: 'tap-status',
+  templateUrl: './tap-status.component.html',
+  styleUrls: ['./tap-status.component.scss'],
 })
-export class LoginComponent {
+export class TapStatusComponent implements OnInit {
 
-  @Input() displayText: boolean;
+    appName: string = '';
+    userName: string = '';
 
-  constructor(public toastController: ToastController,
-              public alertCtrl: AlertController,
-              public tapService: TapService,
-              public changeDetector: ChangeDetectorRef,
-              public loadingCtrl: LoadingController) { }
+  constructor(public tapService: TapService,
+    public events: Events,
+    public alertCtrl: AlertController,
+    public changeDetector: ChangeDetectorRef,
+    public loadingCtrl: LoadingController,
+    public toastController: ToastController) { }
+
+  ngOnInit() {
+    this.events.subscribe('connected',() => {
+      console.log('binding tap status');
+      this.makeBinds()
+    })
+  }
+
+  async makeBinds() {
+    this.appName = (await this.tapService.tap.service.interface.getAppName()).body();
+    this.tapService.tap.sessionState.subscribe(_ => {
+      this.userName = _.name;
+      this.changeDetector.detectChanges();
+    });
+    this.tapService.sessionStateForceUpdate();
+  }
 
   async openLoginAlert() {
     const alert = await this.alertCtrl.create({
@@ -131,4 +149,5 @@ export class LoginComponent {
 
     toast.present();
   }
+
 }

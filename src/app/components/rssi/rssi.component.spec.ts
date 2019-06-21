@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModbusSettingsPage } from './modbus-settings.page';
+import { RssiComponent } from './rssi.component';
 
-describe('ModbusSettingsPage', () => {
-  let component: ModbusSettingsPage;
-  let fixture: ComponentFixture<ModbusSettingsPage>;
+describe('RssiComponent', () => {
+  let component: RssiComponent;
+  let fixture: ComponentFixture<RssiComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ModbusSettingsPage ],
+      declarations: [ RssiComponent ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ModbusSettingsPage);
+    fixture = TestBed.createComponent(RssiComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

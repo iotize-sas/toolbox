@@ -13,6 +13,7 @@ export class ScrollTableComponent implements OnInit {
   @Input() valueName: any;
   @Input() dataArray: any[];
   @Input() formatFn?: (data) => string;
+  @Input() keyFormatFn?: (data) => string;
   @Input() columnSize?: {key: number; value: number, option?: number};
   @Input() showHeader: boolean;
   @Input() leftSlideButtonText: string;

@@ -6,10 +6,13 @@
     <ion-title>
       Home
     </ion-title>
+    <ion-buttons slot="end" *ngIf="isIOS" (click)="beginSession()">
+      <img src="assert/nfc-logo-icon-18-49.png" alt="NFC" class="nfcLogo">
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content scrollCatcher>
   <ion-refresher slot="fixed" (ionRefresh)="refreshDevices($event)" pullMin="120">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -27,7 +30,7 @@
   </ion-list>
 </ion-content>
 <ion-footer>
-  <ion-button *ngIf="!comService.isScanning" (click)="startScan()" expand="full">
+  <ion-button *ngIf="!comService.isScanning" (click)="refreshDevices()" expand="full">
     Start scan
   </ion-button>
   <ion-button *ngIf="comService.isScanning" (click)="stopScan()" expand="full">
@@ -38,6 +41,7 @@
 <ng-template #connectBlock let-device="device">
   <ion-item button color="light" (click)="connect(device)">
     {{device.name}}
+    <rssi slot="end" *ngIf="device.rssi" [bars]="device.rssi | rssiToBars"></rssi>
   </ion-item>
 </ng-template>
 <ng-template #disconnectBlock let-device="device">

@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ModbusOptions, VariableFormat } from '@iotize/device-client.js/device/model';
-import { ResultCode } from '@iotize/device-client.js/client/api/response';
 import { ModbusReadAnswer, ModbusTerminalOptions } from 'src/app/helpers/modbus-helper';
 import { NumberConverter } from '@iotize/device-client.js/client/impl';
-import { ModbusSettingsService } from './modbus-settings.service';
 import { IoTizeTap } from 'iotize-ng-com';
+import { SettingsService } from 'src/app/services/settings.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +12,7 @@ import { IoTizeTap } from 'iotize-ng-com';
 export class ModbusService {
 
   displayMode: 'HEX' | 'DEC' = 'HEX';
+  registerMode: 'HEX' | 'DEC' = 'HEX';
   isReading = false;
   private refreshTime = 1000;
   dataType: 'ASCII' | 'HEX' = 'ASCII';
@@ -27,7 +27,7 @@ export class ModbusService {
   });
 
   constructor(public deviceService: IoTizeTap,
-    public settings: ModbusSettingsService) {
+    public settings: SettingsService) {
   }
 
   async sendNumber(data: number) {

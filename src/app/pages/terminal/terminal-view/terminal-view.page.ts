@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewChecked, AfterContentChecked, DoCheck } from '@angular/core';
 import { Logline, LoggerService } from '../services/logger.service';
 import { TerminalService } from '../services/terminal.service';
 import { ModalController, IonContent } from '@ionic/angular';
@@ -30,12 +30,20 @@ export class TerminalViewPage implements OnInit {
     this.logger.getLogLinesObservable()
       .subscribe((logLines) => {
         this.logLines = logLines;
-        this.content.scrollToBottom(0); // TODO enhance scrolling management (stop auto-scroll if user scrolled up et al)
+        setTimeout( () => this.content.scrollToBottom(0), 50); // TODO enhance scrolling management (stop auto-scroll if user scrolled up et al)
       });
+  }
+  
+  ionViewDidEnter() {
+      this.terminal.launchReadingTask();
+  }
+
+  ionViewWillLeave() {
+      this.terminal.stopReadingTask();
   }
 
   send() {
-      this.terminal.sendInput();
+    this.terminal.sendInput();
   }
 
   clear() {

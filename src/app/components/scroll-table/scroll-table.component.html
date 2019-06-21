@@ -3,7 +3,7 @@
     <ion-item no-padding>
       <ion-row class="grid-body">
         <ion-col [size]="columnSize? columnSize.key : 6" class="centered">
-          {{dataLine[keyName]}}
+          {{keyFormatFn? keyFormatFn(dataLine[keyName]) : dataLine[keyName]}}
         </ion-col>
         <ion-col [size]="columnSize? columnSize.value : 6" class="centered">
           {{formatFn? formatFn(dataLine[valueName]) : dataLine[valueName]}}

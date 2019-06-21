@@ -2,17 +2,17 @@ import { NgModule } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LoginComponent } from './login.component';
+import { RssiComponent } from './rssi.component';
 
 @NgModule({
-    declarations: [LoginComponent],
+    declarations: [RssiComponent],
     imports: [
         IonicModule,
         CommonModule,
         FormsModule,
     ],
     exports: [
-        LoginComponent
+        RssiComponent
     ]
   })
-  export class LoginModule {}
+  export class RssiModule {}
