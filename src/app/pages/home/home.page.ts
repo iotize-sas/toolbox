@@ -189,4 +189,8 @@ export class HomePage implements OnInit{
   beginSession() {
     this.nfc.nfc.beginSession();
   }
+
+  ionViewWillLeave() {
+    this.stopScan();
+  }
 }
