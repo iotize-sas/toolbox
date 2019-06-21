@@ -87,6 +87,10 @@ export class TerminalService {
 
   async readAllTargetData() {
     this.readingData = true;
+    if (!this.tapService.tap) {
+      console.warn('No connected tap');
+      return;
+    }
     try {
       const response = (await this.tapService.tap.service.target.readBytes());
       if (response.isSuccessful()) {

@@ -63,9 +63,12 @@ export class ModbusViewPage implements OnInit {
   // }
 
   async openSettingsModal() {
+    let _this = this;
     const modal = await this.modalController.create({
       component: ModbusModalPage
     });
+
+    modal.onDidDismiss().then(() => _this.changeDetector.detectChanges());
 
     return await modal.present();
   }

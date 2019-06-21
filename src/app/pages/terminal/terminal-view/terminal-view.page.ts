@@ -24,7 +24,7 @@ export class TerminalViewPage implements OnInit {
   ngOnInit() {
     console.log('[TerminalViewPage] init');
     if (!this.terminal.settings.didFetchSettings) {
-      this.terminal.settings.getUARTSettings().catch(error => this.logger.log('error', error.message? error.message: error));
+      this.terminal.settings.getUARTSettings();
     }
 
     this.logger.getLogLinesObservable()

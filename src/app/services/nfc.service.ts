@@ -14,6 +14,8 @@ export interface NFCTag{
 })
 export class NfcService {
 
+  private isListening = false;
+
   public lastTagRead:NFCTag = {
     appName: "",
     macAddress: ""
@@ -30,8 +32,12 @@ export class NfcService {
     }
 
   listenNFC() {
+    if (this.isListening) {
+      return;
+    }
     this.nfc.addNdefListener(() => {
-      console.log('NFC listener ON')
+      console.log('NFC listener ON');
+      this.isListening = true;
     },
       (error) => {
         console.error('NFC listener didn\'t start: ', error)
@@ -71,6 +77,7 @@ export class NfcService {
   }
 
   closeNFC() {
+    console.log('closing NFC technology');
     nfc.close();
   }
 }

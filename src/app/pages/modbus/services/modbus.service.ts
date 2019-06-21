@@ -12,6 +12,7 @@ import { SettingsService } from 'src/app/services/settings.service';
 export class ModbusService {
 
   displayMode: 'HEX' | 'DEC' = 'HEX';
+  registerMode: 'HEX' | 'DEC' = 'HEX';
   isReading = false;
   private refreshTime = 1000;
   dataType: 'ASCII' | 'HEX' = 'ASCII';

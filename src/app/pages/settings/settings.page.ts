@@ -1,6 +1,6 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { SettingsService } from '../../services/settings.service';
-import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController, Events } from '@ionic/angular';
 import { Keyboard } from '@ionic-native/keyboard/ngx';
 import { UartSettings } from '@iotize/device-client.js/device/model';
 import { resolve } from 'q';
@@ -10,14 +10,25 @@ import { resolve } from 'q';
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
 })
-export class SettingsPage {
+export class SettingsPage implements OnInit {
 
   constructor(public settings: SettingsService,
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
     public changeDetector: ChangeDetectorRef,
     public toastController: ToastController,
-    private keyboard: Keyboard) { }
+    private keyboard: Keyboard,
+    public events: Events) { }
+
+    ngOnInit() {
+      this.events.subscribe('needChangeDetection', () => this.changeDetector.detectChanges());
+    }
+
+    ionViewWillEnter() {
+      if (!this.settings.didFetchSettings) {
+        this.readSettingsFromTap();
+      }
+    }
 
   get UartSettings() {
     return UartSettings;
@@ -63,6 +74,9 @@ export class SettingsPage {
     const loader = await this.loadingCtrl.create({ message: 'Reading settings from tap' });
     loader.present();
     try {
+      if (!this.settings.tapService.tap) {
+        throw new Error('Not connected');
+      }
       await this.settings.getUARTSettings();
       loader.dismiss();
     } catch (error) {
@@ -121,6 +135,49 @@ export class SettingsPage {
     }
     return true;
   }
-    
+
+  async autoBaudRate() {
+    const confirm = await this.alertCtrl.create({
+      header: 'AutoBaud',
+      message: 'Do you want to scan for correct baudrate? (this option only works in Modbus)',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.detectBaudRate();
+          }
+        },
+      ]
+    });
+    await confirm.present();
+  }
+
+  async detectBaudRate() {
+    const loader = await this.loadingCtrl.create(
+      {
+        message: 'Searching for baudrate',
+        backdropDismiss: true
+      }
+    );
+    loader.onDidDismiss().then(() => this.settings.stopAutoBaud = true);
+    loader.present();
+    try {
+      const validatedSettings = await this.settings.autoDetectBaudRate();
+      console.log(validatedSettings);
+      loader.dismiss();
+      this.showClosingToast(`Found modbus settings`);
+      this.changeDetector.detectChanges(); //force view update
+    } catch (error) {
+      loader.dismiss();
+      this.showClosingToast(`${error.message ? error.message : error}`);
+    }
+  }
+
 
 }
