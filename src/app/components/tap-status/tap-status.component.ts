@@ -32,6 +32,7 @@ export class TapStatusComponent implements OnInit {
       this.userName = _.name;
       this.changeDetector.detectChanges();
     });
+    this.tapService.sessionStateForceUpdate();
   }
 
   async openLoginAlert() {

@@ -1,4 +1,4 @@
-<div *ngIf="appName">
+<div *ngIf="tapService.tap && tapService.tap.isConnected() && appName">
   <p>
     {{appName | uppercase}}
   </p>
