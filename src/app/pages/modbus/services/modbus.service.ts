@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ModbusOptions, VariableFormat } from '@iotize/device-client.js/device/model';
 import { ModbusReadAnswer, ModbusTerminalOptions } from 'src/app/helpers/modbus-helper';
 import { NumberConverter } from '@iotize/device-client.js/client/impl';
-import { IoTizeTap } from 'iotize-ng-com';
+import { IoTizeTap } from '@iotize/ng-com-services';
 import { SettingsService } from 'src/app/services/settings.service';
 
 @Injectable({

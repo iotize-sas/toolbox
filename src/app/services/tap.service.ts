@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IoTizeTap } from 'iotize-ng-com';
+import { IoTizeTap } from '@iotize/ng-com-services';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { TargetProtocol } from '@iotize/device-client.js/device/model';
 import { NFCComProtocol } from 'plugins/cordova-plugin-iotize-device-com-nfc';

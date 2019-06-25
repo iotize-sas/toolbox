@@ -9,7 +9,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import { IotizeNgComModule } from "iotize-ng-com";
+import { IotizeNgComModule } from "@iotize/ng-com-services";
 import { Keyboard } from '@ionic-native/keyboard/ngx';
 import { NFC } from '@ionic-native/nfc/ngx';
 import { ComponentsModule } from './components/components.module';

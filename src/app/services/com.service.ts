@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from 'iotize-ng-com';
+import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from '@iotize/ng-com-services';
 import { Observable } from 'rxjs';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { Events } from '@ionic/angular';
