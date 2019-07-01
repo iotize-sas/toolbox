@@ -4,6 +4,8 @@ import { ModbusReadAnswer, ModbusTerminalOptions } from 'src/app/helpers/modbus-
 import { NumberConverter } from '@iotize/device-client.js/client/impl';
 import { IoTizeTap } from '@iotize/ng-com-services';
 import { SettingsService } from 'src/app/services/settings.service';
+import { interval, from, Observable, Subject } from 'rxjs';
+import { map, timeInterval } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -68,4 +70,35 @@ export class ModbusService {
       throw response.codeRet();
     }
   }
+
+  monitoring(options?: ModbusOptions, period = 1000): Observable<Monitor<ModbusReadAnswer>> {
+    const timer = interval(period);
+    return new Observable<Monitor<ModbusReadAnswer>>(observer => {
+      const subscription = timer.subscribe(async () => {
+        try {
+          const modbusAnswer = await this.read(true, options);
+          observer.next({
+            type:'next',
+            answer: modbusAnswer
+          });
+        } catch (error) {
+          observer.next({
+            type: 'error',
+            answer: error
+          });
+        }
+      });
+      return {
+        unsubscribe: () => {
+          subscription.unsubscribe();
+          console.log('unsubscribed from the monitoring task');
+        }
+      }
+    })
+  }
+}
+
+export type Monitor<T> = {
+  type: 'next' | 'error',
+  answer : T | any
 }

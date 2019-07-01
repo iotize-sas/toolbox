@@ -25,7 +25,7 @@ export class TapService {
 
   constructor(public iotizeTap: IoTizeTap, public events: Events, public loading: LoadingController, public toast: ToastController) { 
     this.events.subscribe('tag-discovered', (tag: NFCTag) => {
-      if (!this.isReady) {
+      if (!this.tap || !this.tap.isConnected() || !this.isReady) {
         this.NFCLoginAndBLEPairing(tag).then(() => {
           this.events.publish('connected', tag.appName);
         });
@@ -123,8 +123,23 @@ export class TapService {
         loader.dismiss();
       } catch (err) {
         this.iotizeTap.isReady = false;
-        this.events.publish('closeNFC');
-      console.error("Can't connect to TAP, try again" + JSON.stringify(err));
+        console.error("Can't connect to TAP, try again" + JSON.stringify(err));
+        try {
+          console.log('tryig to connect directly through BLE');
+          let bleCom : ComProtocol= new BLEComProtocol(tag.macAddress);
+          //start the BLE communication with the device
+          await this.init(bleCom);
+          this.events.publish('NFCPairing', {
+            name: tag.appName,
+            address: tag.macAddress
+          });
+          loader.dismiss();
+          return;
+        } catch (error) {
+          console.error('BLE only try failed');
+          err = error;
+        } 
+        // this.events.publish('closeNFC');
       console.error(err);
       loader.dismiss();
       const toast = await this.toast.create({message:"Can't connect to TAP, try again",position:"middle", showCloseButton:true});

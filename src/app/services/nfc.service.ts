@@ -21,6 +21,9 @@ export class NfcService {
     macAddress: ""
   };
 
+  private lastEvent:NdefEvent;
+  private allowMime: boolean;
+
   constructor(public nfc: NFC,
     public events: Events) {
       this.events.subscribe('NFCPairing', () => {
@@ -29,6 +32,14 @@ export class NfcService {
       this.events.subscribe('closeNFC', () => {
         this.closeNFC();
       })
+    }
+
+    forceMimeHandle() {
+      if (this.allowMime) {
+        console.log('last event:');
+        console.log(this.lastEvent);
+        this.onDiscoveredTap(this.lastEvent);
+      }
     }
 
   listenNFC() {
@@ -43,6 +54,7 @@ export class NfcService {
         console.error('NFC listener didn\'t start: ', error)
       }).subscribe(event => {
         console.log('NDEF Event')
+        this.lastEvent = event;
         this.onDiscoveredTap(event);
         this.events.publish('tag-discovered', this.lastTagRead);
       });
@@ -52,7 +64,9 @@ export class NfcService {
       (error) => {
         console.error('Mime listener didn\'t start: ', error)
       }).subscribe(event => {
-        console.log('Mime Event')
+        console.log('Mime Event');
+        this.lastEvent = event;
+        this.allowMime = true;
         this.onDiscoveredTap(event);
         this.events.publish('tag-discovered', this.lastTagRead);
       });

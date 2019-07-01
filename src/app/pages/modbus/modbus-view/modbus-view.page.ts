@@ -8,6 +8,7 @@ import { ModbusReadAnswer } from 'src/app/helpers/modbus-helper';
 import { LoggerService } from '../../terminal/services/logger.service';
 import { Keyboard } from "@ionic-native/keyboard/ngx";
 import { ModbusService } from '../services/modbus.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-modbus-view',
@@ -174,6 +175,35 @@ export class ModbusViewPage implements OnInit {
       this.showToast(`Error: device responded ${ResultCodeTranslation[error]}`, 0);
     } else {
       this.showToast(`Error: device responded ${error.message ? error.message : error.toString()}`, 0);
+    }
+  }
+
+  private _monitoringSubs?: Subscription;
+  lastError: {
+    message,
+    time
+  };
+
+  startMonitoring() {
+    this.stopMonitoring();
+    this._monitoringSubs = this.modbus.monitoring().subscribe({
+      next: val => {
+        if (val.type == "next") {
+          this.lastModbusRead = val.answer
+        } else {
+          this.lastError = {
+            message: val.answer.message? val.answer.message: ResultCodeTranslation[val.answer],
+            time: new Date()
+          }
+        }
+      },
+      complete: () => console.log('monitoring completed')
+    });
+  }
+  stopMonitoring() {
+    if (this._monitoringSubs) {
+      this._monitoringSubs.unsubscribe();
+      this._monitoringSubs = null;
     }
   }
 }
