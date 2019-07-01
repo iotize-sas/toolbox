@@ -33,6 +33,10 @@
   </app-scroll-table>
 </ion-content>
 <ion-footer>
+  <div *ngIf="lastError">
+    {{lastError.message}}
+    {{lastError.time}}
+  </div>
   <ion-grid class="clickable smaller-text options-footer">
     <ion-row (click)="openSettingsModal()">
       <ion-col size="1" offset="11">
@@ -80,6 +84,18 @@
       <ion-col size="6">
         <ion-button color="secondary" expand="block" (click)="read()">
           READ <ion-icon name="search"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row class="com-buttons">
+      <ion-col size="6">
+        <ion-button color="secondary" expand="block" (click)="startMonitoring()">
+          START <ion-icon name="send"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button color="secondary" expand="block" (click)="stopMonitoring()">
+          STOP <ion-icon name="search"></ion-icon>
         </ion-button>
       </ion-col>
     </ion-row>

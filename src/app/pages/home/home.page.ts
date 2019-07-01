@@ -24,7 +24,8 @@ export class HomePage implements OnInit{
 
   ngOnInit() {
     this.deviceArraySubscribe();
-    this.nfc.listenNFC();
+    // this.nfc.listenNFC();
+    this.nfc.forceMimeHandle();
     this.nfcPairingSubscribe();
     this.isIOS = this.platform.is("ios");
   }
