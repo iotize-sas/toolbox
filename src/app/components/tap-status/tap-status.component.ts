@@ -23,6 +23,10 @@ export class TapStatusComponent implements OnInit {
     this.events.subscribe('connected',() => {
       console.log('binding tap status');
       this.makeBinds()
+    });
+
+    this.events.subscribe('disconnected', () => {
+      this.changeDetector.detectChanges(); //force view update
     })
   }
 

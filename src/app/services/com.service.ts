@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from 'iotize-ng-com';
+import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from '@iotize/ng-com-services';
 import { Observable } from 'rxjs';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { Events } from '@ionic/angular';
@@ -31,7 +31,17 @@ export class ComService implements IoTizeComService {
     if (device.name) {
       this.selectedDevice = device as DiscoveredDeviceType;
     }
-    const protocol = this.getselectedComService().getProtocol(device);
+    const protocol = this.getselectedComService().getProtocol(device, {
+      connect :{
+        timeout: 60000
+      },
+      disconnect :{
+        timeout: 60000
+      },
+      send :{
+        timeout: 600000
+      },
+    });
     return protocol;
   }
 

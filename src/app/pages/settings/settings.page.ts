@@ -161,7 +161,7 @@ export class SettingsPage implements OnInit {
   async detectBaudRate() {
     const loader = await this.loadingCtrl.create(
       {
-        message: 'Searching for baudrate',
+        message: 'Searching for baudrate on ' + this.UartSettings[this.settings.settings.physicalPort],
         backdropDismiss: true
       }
     );

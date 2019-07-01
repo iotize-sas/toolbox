@@ -1,5 +1,5 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
-import { DiscoveredDeviceType } from 'iotize-ng-com';
+import { DiscoveredDeviceType } from '@iotize/ng-com-services';
 import { ToastController, LoadingController, Events, Platform } from '@ionic/angular';
 import { ComService } from '../../services/com.service';
 import { Subscription } from 'rxjs';
@@ -107,10 +107,14 @@ export class HomePage implements OnInit{
     try {
       await this.tapService.disconnect();
     } catch (error) {
-      this.showError(error);
+      if (error) {
+        this.showError(error);
+      }
     }
     loader.dismiss();
     this.comService.selectedDevice = null;
+    this.events.publish('disconnected');
+    this.changeDetector.detectChanges();
   }
 
   clear() {

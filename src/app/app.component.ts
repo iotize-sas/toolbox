@@ -29,6 +29,11 @@ export class AppComponent {
       title: 'Settings',
       url: '/settings',
       icon: 'settings'
+    },
+    {
+      title: 'Infos',
+      url: '/infos',
+      icon: 'information-circle'
     }
   ];
 

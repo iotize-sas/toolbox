@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IoTizeTap } from 'iotize-ng-com';
+import { IoTizeTap } from '@iotize/ng-com-services';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { TargetProtocol } from '@iotize/device-client.js/device/model';
 import { NFCComProtocol } from 'plugins/cordova-plugin-iotize-device-com-nfc';
@@ -7,6 +7,7 @@ import { SessionState } from '@iotize/device-client.js/device';
 import { BLEComProtocol } from 'plugins/cordova-plugin-iotize-ble';
 import { Events, LoadingController, ToastController } from '@ionic/angular';
 import { NFCTag } from './nfc.service';
+import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
 
 @Injectable({
   providedIn: 'root'
@@ -50,13 +51,14 @@ export class TapService {
       }
       // Disconnect from target, check for current protocol and connect if Modbus or Serial is available
       try {
-        await this.tap.service.target.disconnect();
-      } catch (err) {
-        if (err.code != 'ConnectionError') { // not a connection problem if there's no target
-          throw err
+        const response = await this.tap.service.target.disconnect();
+        if (!response.isSuccessful()) {
+          this.disconnect();
+          throw new Error(ResultCodeTranslation[response.codeRet()]);
         }
-        console.log('no target connected');
-        return;
+      } catch (err) {
+        console.error('[TapService] ', err.message? err.message: err);
+      // throw err;
       }
       const protocol = (await this.tap.service.target.getProtocol()).body();
       if (protocol !== TargetProtocol.MODBUS && protocol !== TargetProtocol.SERIAL_STANDARD && protocol !== TargetProtocol.SERIAL_VIA_TAPNPASS) {
@@ -68,7 +70,7 @@ export class TapService {
 
     disconnect(){
       if (this.tap) {
-        return this.iotizeTap.disconnect();
+        return this.tap.disconnect();
       }
     }
 
