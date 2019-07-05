@@ -14,13 +14,19 @@
 
 <ion-content class="data-table" [scrollY]="true">
   <!-- <p>Last retrieved values</p> -->
-  <ion-grid>
-    <ion-row class="grid-header sticky-header">
-      <ion-col [size]="4" class="center-align">Register#</ion-col>
-      <ion-col [size]="8" class="center-align">Value</ion-col>
+  <ion-grid class="sticky-top">
+    <ion-row class="grid-header">
+      <ion-col size="2" class="center-align">Slave</ion-col>
+      <ion-col size="3" class="center-align">Register#</ion-col>
+      <ion-col size="7" class="center-align">Value</ion-col>
     </ion-row>
+    <ion-item-divider *ngIf="modbus.savedModbusValues && modbus.savedModbusValues.size > 0">
+        <ion-label>
+          Saved Requests
+        </ion-label>
+      </ion-item-divider>
   </ion-grid>
-  <app-scroll-table *ngFor="let modbusRead of savedModbusValues; let i = index; trackBy: savedModbusTrackFn"
+  <!-- <app-scroll-table *ngFor="let modbusRead of savedModbusValues; let i = index; trackBy: savedModbusTrackFn"
     keyName="key" valueName="value" showHeader="true" [dataArray]="modbusRead | modbusData"
     [formatFn]="formatToStringFactory(modbus.displayMode, modbusRead.format)"
     [keyFormatFn]="formatToStringFactory(modbus.displayMode,2)" [columnSize]="{key: 4, value: 8}"
@@ -30,7 +36,41 @@
   <app-scroll-table keyName="key" valueName="value" showHeader="false" [dataArray]="lastModbusRead | modbusData"
     [formatFn]="formatToStringFactory(modbus.displayMode)" [keyFormatFn]="formatToStringFactory(modbus.displayMode,2)"
     [columnSize]="{key: 4, value: 8}" rightSlideButtonText="Keep" (rightSlideButtonClick)="keepLine($event)">
-  </app-scroll-table>
+  </app-scroll-table> -->
+  <modbus-line [modbusReadAnswers]="modbus.savedModbusValues" [registerDisplayMode]="modbus.registerMode"
+    (onDeleteClick)="deleteLine($event)"
+    (onRefreshClick)="refresh($event)"
+    (onMonitorClick)="toggleMonitoring($event)"
+    (onSettingsClick)="openSettings($event)">
+  </modbus-line>
+  <ion-grid class="sticky-bottom" *ngIf="modbus.lastModbusRead">
+      <ion-item-divider>
+          <ion-label>
+            Last Request
+          </ion-label>
+        </ion-item-divider>
+      <ion-item-sliding #lastReadSliding>
+        <ion-item class="no-padding" no-padding>
+          <ion-row class="grid-body">
+            <ion-col size="1" class="centered">
+              {{modbus.lastModbusRead.config.slave}}
+            </ion-col>
+            <ion-col size="3" class="centered">
+              {{modbus.lastModbusRead.config.address | register: modbus.registerMode}}
+            </ion-col>
+            <ion-col size="7" class="centered">
+              {{modbus.lastModbusRead.dataArray | buffer: modbus.lastModbusRead.config.displayOptions.displayAs:modbus.lastModbusRead.config.displayOptions.byteOrder}}
+            </ion-col>
+          </ion-row>
+        </ion-item>
+        <ion-item-options side="start" (ionSwipe)="keepLine(lastReadSliding)">
+          <ion-item-option (click)="keepLine(lastReadSliding)" color="primary">
+            <ion-icon slot="top" name="save"></ion-icon>
+            Save
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+  </ion-grid>
 </ion-content>
 <ion-footer>
   <div *ngIf="lastError">
@@ -48,22 +88,22 @@
         Slave:
       </ion-col>
       <ion-col size="4" class="right-align">
-        {{modbus.modbusOptions.slave}}
+        {{modbus.displayedModbusOptions.slave}}
       </ion-col>
       <ion-col size="2" class="smaller-text"> Register:</ion-col>
-      <ion-col size="4" class="right-align">{{modbus.modbusOptions.address | register : modbus.registerMode}}</ion-col>
+      <ion-col size="4" class="right-align">{{modbus.displayedModbusOptions.address | register : modbus.registerMode}}</ion-col>
     </ion-row>
     <ion-row class="no-overflow color-shade" (click)="openSettingsModal()">
       <ion-col size="2" class="smaller-text">ObjectType:</ion-col>
-      <ion-col size="4" class="right-align">{{modbus.modbusOptions.objectTypeString}}</ion-col>
+      <ion-col size="4" class="right-align">{{modbus.displayedModbusOptions.objectTypeString}}</ion-col>
       <ion-col size="2" class="smaller-text">Format:</ion-col>
-      <ion-col size="4" class="right-align">{{modbus.modbusOptions.formatString | trim: '_'}}</ion-col>
+      <ion-col size="4" class="right-align">{{modbus.displayedModbusOptions.formatString | trim: '_'}}</ion-col>
     </ion-row>
     <ion-row class="no-overflow color-shade" (click)="openSettingsModal()">
       <ion-col size="3" class="smaller-text">Data length:</ion-col>
-      <ion-col size="3" class="right-align">{{modbus.modbusOptions.length}}</ion-col>
+      <ion-col size="3" class="right-align">{{modbus.displayedModbusOptions.length}}</ion-col>
       <ion-col size="3" class="smaller-text">Display as:</ion-col>
-      <ion-col size="3" class="right-align">{{modbus.displayMode}}</ion-col>
+      <ion-col size="3" class="right-align">{{displayConverter[modbus.displayedModbusOptions.displayOptions.displayAs]}}</ion-col>
     </ion-row>
     <!-- </ion-grid> -->
     <ion-row>
@@ -84,18 +124,6 @@
       <ion-col size="6">
         <ion-button color="secondary" expand="block" (click)="read()">
           READ <ion-icon name="search"></ion-icon>
-        </ion-button>
-      </ion-col>
-    </ion-row>
-    <ion-row class="com-buttons">
-      <ion-col size="6">
-        <ion-button color="secondary" expand="block" (click)="startMonitoring()">
-          START <ion-icon name="send"></ion-icon>
-        </ion-button>
-      </ion-col>
-      <ion-col size="6">
-        <ion-button color="secondary" expand="block" (click)="stopMonitoring()">
-          STOP <ion-icon name="search"></ion-icon>
         </ion-button>
       </ion-col>
     </ion-row>

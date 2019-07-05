@@ -1,0 +1,39 @@
+ion-grid {
+    text-align: center !important;
+  }
+  
+  ion-row.grid-body {
+    width: 100%;
+    text-align: center !important;
+    height: 3rem;
+  }
+  
+  ion-col.centered {
+    text-align: center !important;
+    height: 1rem;
+    margin: auto;
+  }
+  
+  ion-item-sliding:nth-child(odd) > ion-item > .grid-body {
+    background-color: #f0f0f0;
+  }
+  
+  ion-item-sliding:nth-child(odd) {
+    background-color: #f0f0f0;
+  }
+  
+  ion-row.sticky-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: var(--ion-background-color, #fff);
+  }
+  
+  ion-item {
+      --padding-start: 0px;
+      --padding-end: 0px;
+      --inner-padding-end: 0px;
+      --min-height: 100%;
+  }
