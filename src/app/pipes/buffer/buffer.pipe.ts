@@ -14,7 +14,7 @@ export class BufferPipe implements PipeTransform {
     let reorderedBuffer: Uint8Array;
 
     if (size == 4) {
-      const converter = new ByteSwapConverter(byteOrder);
+      const converter = new ByteSwapConverter(ByteOrder[byteOrder]);
       reorderedBuffer = converter.decode(buffer);
     } else {
       reorderedBuffer = buffer.slice(0) // copy original buffer

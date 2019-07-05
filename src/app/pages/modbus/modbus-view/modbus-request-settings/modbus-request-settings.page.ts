@@ -50,10 +50,10 @@ export class ModbusRequestSettingsPage {
   }
 
   get byteOrder() {
-    return this._byteOrder;
+    return this._byteOrder.toString();
   }
   set byteOrder(val) {
-    this._byteOrder;
+    this._byteOrder = +val;
   }
 
   get is32bits() {

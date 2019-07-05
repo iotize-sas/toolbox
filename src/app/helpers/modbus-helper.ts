@@ -119,10 +119,10 @@ export enum DataDisplay {
 }
 
 export enum ByteOrder {
-  B3_B2_B1_B0 = "B3_B2_B1_B0",
-  B1_B0_B3_B2 = "B1_B0_B3_B2",
-  B2_B3_B0_B1 = "B2_B3_B0_B1",
-  B0_B1_B2_B3 = "B0_B1_B2_B3",
+  B3_B2_B1_B0 = 0,
+  B1_B0_B3_B2 = 1,
+  B2_B3_B0_B1 = 2,
+  B0_B1_B2_B3 = 3,
 
 }
 

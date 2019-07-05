@@ -48,7 +48,7 @@
     <ion-item>
       <ion-label>Value displayed as</ion-label>
       <ion-select [(ngModel)]="displayMode">
-        <ion-select-option *ngFor="let option of DataDisplay | enum" [(value)]="option.index">
+        <ion-select-option *ngFor="let option of DataDisplay | enum" [(value)]="option.index" [disabled]="option.value == 'FLOAT' && !is32bits">
           {{option.value}}</ion-select-option>
       </ion-select>
     </ion-item>

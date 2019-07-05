@@ -37,7 +37,7 @@ export class ModbusService {
         objectType: ModbusOptions.ObjectType.DEFAULT
       }, this.displayOptions);
       this.saveOptions();
-      this.mockValues();
+      // this.mockValues();
     }
     
   async sendNumber(data: number) {

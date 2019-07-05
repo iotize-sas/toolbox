@@ -125,4 +125,8 @@ export class ModbusModalPage {
   closeKeyboard() {
     this.keyboard.hide();
   }
+
+  get is32bits() {
+    return this.modbus.displayedModbusOptions.format == VariableFormat._32_BITS
+  }
 }
