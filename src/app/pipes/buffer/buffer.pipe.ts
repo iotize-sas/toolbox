@@ -13,6 +13,10 @@ export class BufferPipe implements PipeTransform {
     let size = buffer.length;
     let reorderedBuffer: Uint8Array;
 
+    if (size != 1 && size != 2 && size != 4 && displayAs != DataDisplay.ASCII) {
+      throw new Error('invalid input');
+    }
+
     if (size == 4) {
       const converter = new ByteSwapConverter(ByteOrder[byteOrder]);
       reorderedBuffer = converter.decode(buffer);
@@ -24,7 +28,7 @@ export class BufferPipe implements PipeTransform {
       return '0x' + FormatHelper.toHexString(reorderedBuffer);
     }
     if (displayAs == DataDisplay.ASCII) {
-      return '0x' + FormatHelper.toAsciiString(reorderedBuffer);
+      return FormatHelper.toAsciiString(reorderedBuffer);
     }
 
 
