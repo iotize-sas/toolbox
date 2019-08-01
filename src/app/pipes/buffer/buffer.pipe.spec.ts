@@ -22,7 +22,7 @@ describe('BufferPipe', () => {
     ).toThrow();
   });
 
-  it('should display the same ASCII whatever byteOrder', () => {
+  it('should display the same ASCII string whatever byteOrder', () => {
     const pipe = new BufferPipe();
     const testedString = 'testing pipe';
     expect(
@@ -53,8 +53,5 @@ describe('BufferPipe', () => {
         ByteOrder.B3_B2_B1_B0
       )).toBe(testedString);
   });
-
-  it('should not c')
-
 
 });

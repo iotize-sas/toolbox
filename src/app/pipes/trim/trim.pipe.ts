@@ -6,7 +6,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class TrimPipe implements PipeTransform {
 
   transform(value: string, trimChar: string = ''): string {
-    const ret = value.replace(RegExp(trimChar, 'g'), '');
+    if (trimChar == '') {
+      return value;
+    }
+    const regexBegin = RegExp('^' + trimChar + '*', 'g');
+    const regexEnd = RegExp(trimChar + '*$', 'g');
+    const ret = value.replace(regexBegin, '').replace(regexEnd, '');
     return ret;
   }
 }

@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { FormatHelper } from '@iotize/device-client.js/core';
 import { NumberConverter, FloatConverter } from '@iotize/device-client.js/client/impl';
-import { DataDisplay, DisplayOptions, ByteOrder } from 'src/app/helpers/modbus-helper';
+import { DataDisplay, ByteOrder } from 'src/app/helpers/modbus-helper';
 import { ByteSwapConverter } from '@iotize/device-client.js/device/extra-converter';
 
 @Pipe({
