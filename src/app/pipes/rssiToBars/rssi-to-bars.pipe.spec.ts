@@ -11,6 +11,12 @@ describe('RssiToBarsPipe', () => {
     expect(pipe).toBeTruthy();
   });
 
+  it('should have coherent delimiters', () => {
+    expect(RssiToBarsPipe.DISPLAY_TWO_BARS).toBeLessThan(RssiToBarsPipe.DISPLAY_THREE_BARS);
+    expect(RssiToBarsPipe.DISPLAY_THREE_BARS).toBeLessThan(RssiToBarsPipe.DISPLAY_FOUR_BARS);
+    expect(RssiToBarsPipe.DISPLAY_FOUR_BARS).toBeLessThan(RssiToBarsPipe.DISPLAY_FIVE_BARS);
+  });
+
   it('should return 1 if rssi is below DISPLAY_TWO_BARS', () => {
     const testedValue = RssiToBarsPipe.DISPLAY_TWO_BARS - 1;
     expect(pipe.transform(testedValue)).toBe(1);

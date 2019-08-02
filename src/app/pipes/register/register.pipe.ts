@@ -10,8 +10,10 @@ export class RegisterPipe implements PipeTransform {
       return address.toString();
     }
     if (mode == 'HEX') {
-      const hexString = ('000' + address.toString(16).toUpperCase()).slice(-4); // modbus register are 16 bits
-      return '0x'+ hexString;
+      const hexString = address.toString(16).toUpperCase();
+      const size = Math.max(hexString.length ,4);
+      const finalString = ('000' + hexString).slice(-size); // display at least as 16-string
+      return '0x'+ finalString;
     }
   }
 
