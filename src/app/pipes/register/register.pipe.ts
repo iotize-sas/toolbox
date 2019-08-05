@@ -5,20 +5,15 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class RegisterPipe implements PipeTransform {
 
-  transform(address: number, mode: string): any {
-    console.log('[RegisterPipe] address', address, 'mode', mode)
+  transform(address: number, mode: string): string {
     if (mode == 'DEC')  {
-      return address;
+      return address.toString();
     }
     if (mode == 'HEX') {
       const hexString = address.toString(16).toUpperCase();
-      let returnedValue = '0x';
-      if (hexString.length % 2 == 1) {
-        returnedValue += '0';
-      }
-      returnedValue += hexString;
-      return returnedValue;
-
+      const size = Math.max(hexString.length ,4);
+      const finalString = ('000' + hexString).slice(-size); // display at least as 16-string
+      return '0x'+ finalString;
     }
   }
 

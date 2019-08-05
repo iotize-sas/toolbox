@@ -5,10 +5,13 @@ ion-grid {
 ion-row.grid-body {
   width: 100%;
   text-align: center !important;
+  height: 2rem;
 }
 
 ion-col.centered {
   text-align: center !important;
+  height: 1rem;
+  margin: auto;
 }
 
 ion-item-sliding:nth-child(odd) > ion-item > .grid-body {

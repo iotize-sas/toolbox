@@ -1,0 +1,39 @@
+<ion-grid>
+  <ion-item-sliding #slidingCase *ngFor="let keyValue of modbusReadAnswers | keyvalue">
+    <ion-item no-padding>
+      <ion-row>
+        <ion-icon *ngIf="isMonitored(keyValue.key)" name="play" slot="end"></ion-icon>
+      </ion-row>
+      <ion-row class="grid-body">
+        <ion-col size="1" class="centered">
+          {{keyValue.value.config.slave}}
+        </ion-col>
+        <ion-col size="3" class="centered">
+          {{keyValue.value.config.address | register: registerDisplayMode}}
+        </ion-col>
+        <ion-col size="7" class="centered">
+          {{keyValue.value.dataArray | buffer: keyValue.value.config.displayOptions.displayAs:keyValue.value.config.displayOptions.byteOrder}}
+        </ion-col>
+      </ion-row>
+    </ion-item>
+    <ion-item-options side="end">
+      <ion-item-option (click)="openSettings(keyValue.value.id, slidingCase)" color="success">
+          <ion-icon slot="top" name="settings"></ion-icon>
+          settings
+      </ion-item-option>
+      <ion-item-option (click)="delete(keyValue.value.id, slidingCase)" color="danger">
+          <ion-icon slot="top" name="trash"></ion-icon>
+          Delete
+      </ion-item-option>
+    </ion-item-options>
+    <ion-item-options side="start">
+      <ion-item-option (click)="refresh(keyValue.value.id, slidingCase)" color="primary">
+        <ion-icon slot="top" name="refresh"></ion-icon>
+        Refresh
+      </ion-item-option>
+      <ion-item-option color="secondary" (click)="toggleMonitoring(keyValue.value.id, slidingCase)">
+        <ion-icon slot="top" [name]="isMonitored(keyValue.key)? 'pause': 'play'"></ion-icon>
+        Monitoring</ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
+</ion-grid>

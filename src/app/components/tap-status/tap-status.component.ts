@@ -22,7 +22,7 @@ export class TapStatusComponent implements OnInit {
   ngOnInit() {
     this.events.subscribe('connected',() => {
       console.log('binding tap status');
-      this.makeBinds()
+      this.makeBinds();
     });
 
     this.events.subscribe('disconnected', () => {
@@ -153,5 +153,4 @@ export class TapStatusComponent implements OnInit {
 
     toast.present();
   }
-
 }

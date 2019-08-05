@@ -59,3 +59,35 @@ ion-row.grid-header {
   height: 100%;
   border-radius: 3em 3em 0em 0em;
 }
+
+ion-row.grid-body {
+  width: 100%;
+  text-align: center !important;
+  height: 3rem;
+}
+
+ion-col.centered {
+  text-align: center !important;
+  height: 1rem;
+  margin: auto;
+}
+
+.no-padding {
+  --padding-start: 0px;
+  --padding-end: 0px;
+  --inner-padding-end: 0px;
+  --min-height: 100%;
+}
+
+.sticky-bottom {
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
+}
+.sticky-top {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--background);
+}

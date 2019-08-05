@@ -2,7 +2,7 @@
   <ion-toolbar color="primary">
     <ion-title>Modbus Settings</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">Back</ion-button>
+      <ion-button (click)="cancelAndDismiss()">Back</ion-button>
       <ion-back-button text="BACK"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
@@ -18,10 +18,10 @@
     </ion-item>
     <ion-item [color]="isRegisterValidHexString? '':'danger'">
       <ion-label>Register</ion-label>
-      <ion-input *ngIf="registerMode == 'DEC'" type="number" min="0" [(ngModel)]="address" class="right-align"
+      <ion-input *ngIf="modbus.registerMode == 'DEC'" type="number" min="0" [(ngModel)]="address" class="right-align"
         (keyup.enter)="closeKeyboard()" clearInput>
       </ion-input>
-      <ion-input *ngIf="registerMode == 'HEX'" type="text" maxlength="8" [(ngModel)]="hexAddress" class="right-align"
+      <ion-input *ngIf="modbus.registerMode == 'HEX'" type="text" maxlength="8" [(ngModel)]="hexAddress" class="right-align"
         (keyup.enter)="closeKeyboard()" clearInput>
       </ion-input>
     </ion-item>
@@ -48,13 +48,13 @@
     <ion-item>
       <ion-label>Value displayed as</ion-label>
       <ion-select [(ngModel)]="displayMode">
-        <ion-select-option value="HEX">HEX</ion-select-option>
-        <ion-select-option value="DEC">DEC</ion-select-option>
+        <ion-select-option *ngFor="let option of DataDisplay | enum" [(value)]="option.index" [disabled]="option.value == 'FLOAT' && !is32bits">
+          {{option.value}}</ion-select-option>
       </ion-select>
     </ion-item>
     <ion-item>
-      <ion-label>Register displayed as</ion-label>
-      <ion-select [(ngModel)]="registerMode">
+      <ion-label>Registers displayed as</ion-label>
+      <ion-select [(ngModel)]="modbus.registerMode">
         <ion-select-option value="HEX">HEX</ion-select-option>
         <ion-select-option value="DEC">DEC</ion-select-option>
       </ion-select>

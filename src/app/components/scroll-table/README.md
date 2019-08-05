@@ -21,18 +21,25 @@ A 2-dimensional scrollable table component
 | Type        |`string | undefined`|
 
 ## keyAlias
+
 | Description | Title of the first column. Default value is `keyName`  |
 |-------------|---|
 | Type        |`string | undefined`|
+
 ## valueAlias
+
 | Description | Title of the first column. Default value is `valueName`  |
 |-------------|---|
 | Type        |`string | undefined`|
+
 ## formatFn
+
 | Description | Formatting function to call on each element in `dataArray` . By default, displays every element unmodified |
 |-------------|---|
 | Type        |`(data) => string | undefined`|
+
 ## columnSize
+
 | Description | Size of each columns according to 12-col ion-grid system. Default value is `{key: 6, value: 6}` |
 |-------------|---|
 | Type        |`{key: number, value: number} | undefined`|

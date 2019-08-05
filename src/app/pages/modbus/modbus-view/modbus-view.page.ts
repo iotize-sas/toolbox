@@ -3,12 +3,13 @@ import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/respo
 import { ModbusOptions, VariableFormat } from '@iotize/device-client.js/device/model';
 import { ToastOptions } from '@ionic/core';
 import { ModbusModalPage } from './modbus-modal/modbus-modal.page';
-import { IonContent, ModalController, ToastController, AlertController } from '@ionic/angular';
-import { ModbusReadAnswer } from 'src/app/helpers/modbus-helper';
+import { IonContent, ModalController, ToastController, AlertController, IonItemSliding } from '@ionic/angular';
+import { ModbusReadAnswer, DataDisplay } from 'src/app/helpers/modbus-helper';
 import { LoggerService } from '../../terminal/services/logger.service';
 import { Keyboard } from "@ionic-native/keyboard/ngx";
 import { ModbusService } from '../services/modbus.service';
 import { Subscription } from 'rxjs';
+import { ModbusRequestSettingsPage } from './modbus-request-settings/modbus-request-settings.page';
 
 @Component({
   selector: 'app-modbus-view',
@@ -20,11 +21,6 @@ export class ModbusViewPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
 
   data = '';
-  linesCount = 0;
-
-  savedModbusValues: ModbusReadAnswer[] = [];
-
-  lastModbusRead: ModbusReadAnswer;
 
   constructor(public modbus: ModbusService,
     public logger: LoggerService,
@@ -69,40 +65,45 @@ export class ModbusViewPage implements OnInit {
       component: ModbusModalPage
     });
 
-    modal.onDidDismiss().then(() => _this.changeDetector.detectChanges());
+    modal.onDidDismiss().then(() => {
+      _this.changeDetector.detectChanges()
+    });
 
     return await modal.present();
   }
 
-  formatToStringFactory(displayAs: 'HEX' | 'DEC', format?: VariableFormat) {
-    if (displayAs === 'DEC') {
-      return function (val) {
-        return val;
-      };
-    } else {
-      const _this = this;
-      if (!format) {
-        format = this.lastModbusRead? this.lastModbusRead.format : VariableFormat._16_BITS;
-      }
-      return function (val) {
-        return _this.formatToStringClosure(val, format);
-      };
-    }
-  }
+  // formatToStringFactory(displayAs: 'HEX' | 'DEC', format?: VariableFormat) {
+  //   if (displayAs === 'DEC') {
+  //     return function (val) {
+  //       return val;
+  //     };
+  //   } else {
+  //     const _this = this;
+  //     if (!format) {
+  //       if (this.modbus.lastModbusRead && this.modbus.lastModbusRead.config && this.modbus.lastModbusRead.config.format)
+  //       format = this.modbus.lastModbusRead.config.format;
+  //     } else {
+  //       format = VariableFormat._16_BITS;
+  //     }
+  //     return function (val) {
+  //       return _this.formatToStringClosure(val, format);
+  //     };
+  //   }
+  // }
 
-  formatToStringClosure(value, format) {
-    if (format !== 0) {
-      let result = value.toString(16).toUpperCase();
-      result = '0000000' + result;
-      result = '0x' + result.slice(-(2 ** format));
-      return result;
-    }
-    return !!value;
-  }
+  // formatToStringClosure(value, format) {
+  //   if (format !== 0) {
+  //     let result = value.toString(16).toUpperCase();
+  //     result = '0000000' + result;
+  //     result = '0x' + result.slice(-(2 ** format));
+  //     return result;
+  //   }
+  //   return !!value;
+  // }
 
   async read() {
     try {
-      this.lastModbusRead = await this.modbus.read();
+      await this.modbus.readLast();
     } catch (error) {
       this.showError(error);
     }
@@ -121,46 +122,28 @@ export class ModbusViewPage implements OnInit {
 
   canSend() {
     if (this.modbus.deviceService.isReady) {
-      return (this.modbus.modbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
-      (this.modbus.modbusOptions.objectType !== ModbusOptions.ObjectType.INPUT_REGISTER);
+      return (this.modbus.savedModbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
+      (this.modbus.savedModbusOptions.objectType !== ModbusOptions.ObjectType.INPUT_REGISTER);
     }
     return false;
   }
 
-  keepLine(id) {
-    console.log(id);
-    const offset = this.lastModbusRead.format === VariableFormat._32_BITS ? 2 : 1;
-    const address = this.lastModbusRead.firstAddress + id * offset;
-
-    if (this.savedModbusValues.find(el => el.firstAddress === address)) {
-      return;
+  keepLine(slidingEl?: IonItemSliding) {
+    if (slidingEl) {
+      slidingEl.closeOpened();
     }
-
-    const posInArray = id * 2 * offset;
-    this.savedModbusValues.push({
-      objectType: this.lastModbusRead.objectType,
-      format: this.lastModbusRead.format,
-      firstAddress: address,
-      dataArray: this.lastModbusRead.dataArray.slice(posInArray, posInArray + 2 * offset)
-    });
+    this.modbus.keepLine();
     this.changeDetector.detectChanges();
   }
+
   deleteLine(id) {
-    this.savedModbusValues.splice(id, 1);
+    this.modbus.delete(id);
     this.changeDetector.detectChanges();
   }
 
-  async refresh(index: number) {
+  async refresh(index?: number) {
     try {
-      const options: ModbusOptions = {
-        address: this.savedModbusValues[index].firstAddress,
-        format: this.savedModbusValues[index].format,
-        length: 1,
-        objectType: this.savedModbusValues[index].objectType,
-        slave: this.modbus.modbusOptions.slave
-      };
-      const refreshedModbus = await this.modbus.read(true, options);
-      this.savedModbusValues[index] = refreshedModbus;
+      await this.modbus.refresh(index);
     } catch (error) {
       this.showError(error);
     }
@@ -178,32 +161,26 @@ export class ModbusViewPage implements OnInit {
     }
   }
 
-  private _monitoringSubs?: Subscription;
-  lastError: {
-    message,
-    time
-  };
-
-  startMonitoring() {
-    this.stopMonitoring();
-    this._monitoringSubs = this.modbus.monitoring().subscribe({
-      next: val => {
-        if (val.type == "next") {
-          this.lastModbusRead = val.answer
-        } else {
-          this.lastError = {
-            message: val.answer.message? val.answer.message: ResultCodeTranslation[val.answer],
-            time: new Date()
-          }
-        }
-      },
-      complete: () => console.log('monitoring completed')
-    });
+  get displayConverter() {
+    return DataDisplay
   }
-  stopMonitoring() {
-    if (this._monitoringSubs) {
-      this._monitoringSubs.unsubscribe();
-      this._monitoringSubs = null;
-    }
+
+  toggleMonitoring(index) {
+    this.modbus.toggleMonitoring(index);
+  }
+  async openSettings(index) {
+    let _this = this;
+    let data = {index: index};
+    const modal = await this.modalController.create({
+      component: ModbusRequestSettingsPage,
+      componentProps: data
+    });
+
+    modal.onDidDismiss().then(() => {
+      console.log('didDismissed Settings');
+      _this.changeDetector.detectChanges()
+    });
+
+    return await modal.present();
   }
 }
