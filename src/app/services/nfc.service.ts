@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { NFC, NdefEvent } from '@ionic-native/nfc/ngx'
-import { Events } from '@ionic/angular';
+import { Events, Platform } from '@ionic/angular';
 
 declare var nfc;
+declare var NFCTapPlugin;
 
 export interface NFCTag{
   appName: string;
@@ -25,7 +26,7 @@ export class NfcService {
   private allowMime: boolean;
 
   constructor(public nfc: NFC,
-    public events: Events) {
+    public events: Events, public platform: Platform) {
       this.events.subscribe('NFCPairing', () => {
         this.closeNFC();
       })
@@ -38,14 +39,21 @@ export class NfcService {
       if (this.allowMime) {
         console.log('last event:');
         console.log(this.lastEvent);
-        this.onDiscoveredTap(this.lastEvent);
+        this.onDiscoveredTap();
       }
     }
 
   listenNFC() {
     if (this.isListening) {
+      console.log('NFC listener already set up');
       return;
     }
+
+    if (this.platform.is('ios')) {
+      console.log('no listener on iOS');
+      return;
+    }
+
     this.nfc.addNdefListener(() => {
       console.log('NFC listener ON');
       this.isListening = true;
@@ -55,27 +63,34 @@ export class NfcService {
       }).subscribe(event => {
         console.log('NDEF Event')
         this.lastEvent = event;
-        this.onDiscoveredTap(event);
-        this.events.publish('tag-discovered', this.lastTagRead);
+        this.onDiscoveredTap();
       });
-    this.nfc.addMimeTypeListener("application/com.iotize.toolbox",() => {
-      console.log('Mime listener ON')
-    },
-      (error) => {
-        console.error('Mime listener didn\'t start: ', error)
-      }).subscribe(event => {
-        console.log('Mime Event');
-        this.lastEvent = event;
-        this.allowMime = true;
-        this.onDiscoveredTap(event);
-        this.events.publish('tag-discovered', this.lastTagRead);
-      });
+
+      if (this.platform.is('android')) { // listen for the tag that openned the app 
+
+        this.nfc.addMimeTypeListener("application/com.iotize.toolbox",() => {
+          console.log('Mime listener ON')
+        },
+        (error) => {
+          console.error('Mime listener didn\'t start: ', error)
+        }).subscribe(event => {
+          console.log('Mime Event');
+          this.lastEvent = event;
+          this.allowMime = true;
+          this.onDiscoveredTap();
+        });
+      }
   }
 
-  onDiscoveredTap(event: NdefEvent) {
+  onDiscoveredTap(event?: NdefEvent) {
+    if (!event) {
+      event = this.lastEvent
+    }
     let message = event.tag.ndefMessage;
     this.lastTagRead.appName = String.fromCharCode(...message[3].payload.filter(byte => byte != 0));
     this.lastTagRead.macAddress = this.convertBytesToBLEAddress(message[2].payload);
+    this.events.publish('tag-discovered', this.lastTagRead);
+
   }
 
   convertBytesToBLEAddress(bytes: number[]): string {
@@ -94,4 +109,35 @@ export class NfcService {
     console.log('closing NFC technology');
     nfc.close();
   }
+
+  iOSreadNDEFTag() {
+    return new Promise((resolve, reject) => {
+
+      const successCallBack = (data) => {
+        console.log('iOSreadNDEFTag data');
+        console.log(data);
+          const jsonObject = JSON.parse(data);
+          this.lastEvent = {
+            tag: jsonObject
+          };
+          this.onDiscoveredTap();
+        resolve();
+      } 
+      
+      const errorCallBack = (error) => {
+        console.log('iOSreadNDEFTag error');
+        console.log(error);
+        reject(error);
+      }
+
+      const message = 'Get close to an IoTize Tap';
+
+      NFCTapPlugin.getNDEFTag(successCallBack, errorCallBack, message);
+    })
+  }
+
+  beginSession(success?: Function, failure?: Function) {
+    return nfc.beginSession(success, failure)
+  }
 }
+

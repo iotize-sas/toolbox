@@ -27,6 +27,7 @@ export class HomePage implements OnInit{
     // this.nfc.listenNFC();
     this.nfc.forceMimeHandle();
     this.nfcPairingSubscribe();
+    this.events.subscribe('connected', () => this.changeDetector.detectChanges());
     this.isIOS = this.platform.is("ios");
   }
 
@@ -186,16 +187,22 @@ export class HomePage implements OnInit{
 
   nfcPairingSubscribe() {
     this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => {
+      console.log('nfcPairingSubscribe');
       if (this.devices.find(el => el.address == tag.address && el.name == tag.name) == undefined) {
         this.devices.unshift(tag);
       }
     });
   }
+
   beginSession() {
-    this.nfc.nfc.beginSession();
+    this.nfc.beginSession(() => console.log("iOS NFC Session is on"));
   }
 
   ionViewWillLeave() {
     this.stopScan();
+  }
+
+  iOSReadNdefTag() {
+    this.nfc.iOSreadNDEFTag();
   }
 }

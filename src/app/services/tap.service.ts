@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { IoTizeTap } from '@iotize/ng-com-services';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { TargetProtocol } from '@iotize/device-client.js/device/model';
-import { NFCComProtocol } from 'plugins/cordova-plugin-iotize-device-com-nfc';
+import { NFCComProtocol } from '@iotize/device-com-nfc.cordova';
 import { SessionState } from '@iotize/device-client.js/device';
-import { BLEComProtocol } from 'plugins/cordova-plugin-iotize-ble';
-import { Events, LoadingController, ToastController } from '@ionic/angular';
+import { BLEComProtocol, DiscoveredDeviceType } from '@iotize/cordova-plugin-iotize-ble';
+import { Events, LoadingController, ToastController, Platform } from '@ionic/angular';
 import { NFCTag } from './nfc.service';
 import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
+import { NFCIosComProtocol } from '../helpers/nfc-ios-com-protocol';
+import { ComService } from './com.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,12 @@ export class TapService {
     return this.iotizeTap.sessionStateForceUpdate();
   }
 
-  constructor(public iotizeTap: IoTizeTap, public events: Events, public loading: LoadingController, public toast: ToastController) { 
+  constructor(public iotizeTap: IoTizeTap,
+    public events: Events,
+    public loading: LoadingController,
+    public toast: ToastController,
+    public platform: Platform,
+    public com: ComService) { 
     this.events.subscribe('tag-discovered', (tag: NFCTag) => {
       if (!this.tap || !this.tap.isConnected() || !this.isReady) {
         this.NFCLoginAndBLEPairing(tag).then(() => {
@@ -93,9 +100,32 @@ export class TapService {
 
       loader.present();
 
+      const discoveredDevice: DiscoveredDeviceType = {
+        name: tag.appName,
+        address: tag.macAddress
+      };
+
+      const bleOptions = {
+        connect: {
+          timeout: 2000
+        },
+        disconnect: {
+          timeout: 2000
+        },
+        send: {
+          timeout: 2000
+        } 
+      };
+
       try {
         //start a communication session in NFC
-        await this.init(new NFCComProtocol());
+        let nfcProtocol: ComProtocol;
+        if (this.platform.is('ios')) {
+          nfcProtocol = new NFCIosComProtocol();
+        } else {
+          nfcProtocol = new NFCComProtocol();
+        }
+        await this.init(nfcProtocol);
         
         //enable NFC auto login
         await this.tap.encryption(true);
@@ -107,32 +137,48 @@ export class TapService {
 
         loader.message = `Logged as ${sessionState.name}, switching to BLE`;
         
+        let realDevice;
         //connect to the device in BLE
-        let bleCom : ComProtocol= new BLEComProtocol(tag.macAddress);
+        if (this.platform.is('ios')) {
+          realDevice = await this.com.scanForSpecificDevice(discoveredDevice.name);
+        } else {
+          realDevice = discoveredDevice;
+        }
+
+        let bleCom : ComProtocol = new BLEComProtocol(realDevice.address, bleOptions);
         //start the BLE communication with the device
         await this.tap.useComProtocol(bleCom).connect();
         
+        if (this.platform.is('ios')) {
+          console.log('Close NFC Session');
+          nfcProtocol.disconnect(); // End NFC reading session
+        }
+
         //check the connection
         sessionState = await this.tap.refreshSessionState();
         const bleSessionStateString = JSON.stringify(sessionState);
         console.log(`NFCLoginAndBLEPairing in BLE:  `+ bleSessionStateString);
-        this.events.publish('NFCPairing', {
-          name: tag.appName,
-          address: tag.macAddress
-        });
+
+        this.events.publish('NFCPairing', realDevice);
         loader.dismiss();
       } catch (err) {
         this.iotizeTap.isReady = false;
         console.error("Can't connect to TAP, try again" + JSON.stringify(err));
         try {
           console.log('tryig to connect directly through BLE');
-          let bleCom : ComProtocol= new BLEComProtocol(tag.macAddress);
+          
+          let realDevice;
+          //connect to the device in BLE
+          if (this.platform.is('ios')) {
+            realDevice = await this.com.scanForSpecificDevice(discoveredDevice.name);
+          } else {
+            realDevice = discoveredDevice;
+          }
+
+          let bleCom : ComProtocol = new BLEComProtocol(realDevice, bleOptions);
           //start the BLE communication with the device
           await this.init(bleCom);
-          this.events.publish('NFCPairing', {
-            name: tag.appName,
-            address: tag.macAddress
-          });
+          this.events.publish('NFCPairing', realDevice);
           loader.dismiss();
           return;
         } catch (error) {

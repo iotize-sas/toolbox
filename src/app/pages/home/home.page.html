@@ -6,8 +6,10 @@
     <ion-title>
       Home
     </ion-title>
-    <ion-buttons slot="end" *ngIf="isIOS" (click)="beginSession()">
-      <img src="assert/nfc-logo-icon-18-49.png" alt="NFC" class="nfcLogo">
+    <ion-buttons slot="end" *ngIf="isIOS">
+      <ion-button (click)="iOSReadNdefTag()">
+        <img src="/assets/nfc/nfc-logo-icon-18-49.png" alt="NFC" class="nfcLogo">
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
