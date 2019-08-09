@@ -45,13 +45,14 @@ export class AppComponent {
     public nfc: NfcService
   ) {
     this.initializeApp();
-    this.nfc.listenNFC();
+    // this.nfc.listenNFC();
   }
-
+  
   initializeApp() {
     this.platform.ready().then(() => {
       this.statusBar.styleLightContent();
       this.splashScreen.hide();
+      this.nfc.listenNFC(); // iOS tweak
     });
   }
 }

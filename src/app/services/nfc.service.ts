@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { NFC, NdefEvent } from '@ionic-native/nfc/ngx'
 import { Events, Platform } from '@ionic/angular';
+import { Observable, fromEvent } from 'rxjs';
 
 declare var nfc;
 declare var NFCTapPlugin;
 
-export interface NFCTag{
+export interface NFCTag {
   appName: string;
   macAddress: string;
 }
@@ -17,31 +18,31 @@ export class NfcService {
 
   private isListening = false;
 
-  public lastTagRead:NFCTag = {
+  public lastTagRead: NFCTag = {
     appName: "",
     macAddress: ""
   };
 
-  private lastEvent:NdefEvent;
+  private lastEvent: NdefEvent;
   private allowMime: boolean;
 
   constructor(public nfc: NFC,
     public events: Events, public platform: Platform) {
-      this.events.subscribe('NFCPairing', () => {
-        this.closeNFC();
-      })
-      this.events.subscribe('closeNFC', () => {
-        this.closeNFC();
-      })
-    }
+    this.events.subscribe('NFCPairing', () => {
+      this.closeNFC();
+    })
+    this.events.subscribe('closeNFC', () => {
+      this.closeNFC();
+    })
+  }
 
-    forceMimeHandle() {
-      if (this.allowMime) {
-        console.log('last event:');
-        console.log(this.lastEvent);
-        this.onDiscoveredTap();
-      }
+  forceMimeHandle() {
+    if (this.allowMime) {
+      console.log('last event:');
+      console.log(this.lastEvent);
+      this.onDiscoveredTap();
     }
+  }
 
   listenNFC() {
     if (this.isListening) {
@@ -49,12 +50,12 @@ export class NfcService {
       return;
     }
 
-    if (this.platform.is('ios')) {
-      console.log('no listener on iOS');
-      return;
-    }
+    // if (this.platform.is('ios')) {
+    //   console.log('no listener on iOS');
+    //   return;
+    // }
 
-    this.nfc.addNdefListener(() => {
+    this.addNdefListener(() => {
       console.log('NFC listener ON');
       this.isListening = true;
     },
@@ -66,11 +67,11 @@ export class NfcService {
         this.onDiscoveredTap();
       });
 
-      if (this.platform.is('android')) { // listen for the tag that openned the app 
+    if (this.platform.is('android')) { // listen for the tag that openned the app 
 
-        this.nfc.addMimeTypeListener("application/com.iotize.toolbox",() => {
-          console.log('Mime listener ON')
-        },
+      this.nfc.addMimeTypeListener("application/com.iotize.toolbox", () => {
+        console.log('Mime listener ON')
+      },
         (error) => {
           console.error('Mime listener didn\'t start: ', error)
         }).subscribe(event => {
@@ -79,7 +80,7 @@ export class NfcService {
           this.allowMime = true;
           this.onDiscoveredTap();
         });
-      }
+    }
   }
 
   onDiscoveredTap(event?: NdefEvent) {
@@ -95,14 +96,14 @@ export class NfcService {
 
   convertBytesToBLEAddress(bytes: number[]): string {
     return bytes.slice(1)
-                .map(byte => {
-                  if (byte < 0) {
-                    byte += 256;
-                  }
-                  return ('0' + byte.toString(16).toUpperCase()).slice(-2);
-                })
-                .reverse()
-                .join(':')
+      .map(byte => {
+        if (byte < 0) {
+          byte += 256;
+        }
+        return ('0' + byte.toString(16).toUpperCase()).slice(-2);
+      })
+      .reverse()
+      .join(':')
   }
 
   closeNFC() {
@@ -116,14 +117,14 @@ export class NfcService {
       const successCallBack = (data) => {
         console.log('iOSreadNDEFTag data');
         console.log(data);
-          const jsonObject = JSON.parse(data);
-          this.lastEvent = {
-            tag: jsonObject
-          };
-          this.onDiscoveredTap();
+        const jsonObject = JSON.parse(data);
+        this.lastEvent = {
+          tag: jsonObject
+        };
+        this.onDiscoveredTap();
         resolve();
-      } 
-      
+      }
+
       const errorCallBack = (error) => {
         console.log('iOSreadNDEFTag error');
         console.log(error);
@@ -138,6 +139,13 @@ export class NfcService {
 
   beginSession(success?: Function, failure?: Function) {
     return nfc.beginSession(success, failure)
+  }
+
+  addNdefListener(onSuccess?: Function, onFailure?: Function): Observable<any> {
+
+    console.log('addNdefListener called');
+    return fromEvent(document, 'ndef');
+
   }
 }
 
