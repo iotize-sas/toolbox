@@ -4,7 +4,6 @@ import { Events, Platform } from '@ionic/angular';
 import { Observable, fromEvent } from 'rxjs';
 
 declare var nfc;
-declare var NFCTapPlugin;
 
 export interface NFCTag {
   appName: string;
@@ -111,7 +110,7 @@ export class NfcService {
     nfc.close();
   }
 
-  iOSreadNDEFTag() {
+  beginNDEFSession() {
     return new Promise((resolve, reject) => {
 
       const successCallBack = (data) => {
@@ -133,7 +132,7 @@ export class NfcService {
 
       const message = 'Get close to an IoTize Tap';
 
-      NFCTapPlugin.getNDEFTag(successCallBack, errorCallBack, message);
+      nfc.beginNDEFSession(successCallBack, errorCallBack, message);
     })
   }
 

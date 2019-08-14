@@ -29,9 +29,8 @@
     "@ionic/angular": "^4.1.0",
     "@iotize/cordova-plugin-iotize-ble": "^1.1.0-alpha.28",
     "@iotize/device-client.js": "0.0.1-alpha.98",
-    "@iotize/device-com-nfc.cordova": "^1.0.0-alpha.10",
+    "@iotize/device-com-nfc.cordova": "file:../device-com-nfc.cordova",
     "@iotize/ng-com-services": "0.0.1",
-    "TapNFC": "file:../../tmp/NFCTapPlugin",
     "cordova-android": "7.1.4",
     "cordova-ios": "5.0.1",
     "cordova-plugin-add-swift-support": "^2.0.2",
@@ -87,7 +86,7 @@
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-iotize-ble": {},
       "cordova-plugin-app-version": {},
-      "cordova-plugin-iotize-nfc": {}
+      "cordova-plugin-iotize-device-com-nfc": {}
     },
     "platforms": [
       "android",

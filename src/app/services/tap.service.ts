@@ -8,7 +8,6 @@ import { BLEComProtocol, DiscoveredDeviceType } from '@iotize/cordova-plugin-iot
 import { Events, LoadingController, ToastController, Platform } from '@ionic/angular';
 import { NFCTag } from './nfc.service';
 import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
-import { NFCIosComProtocol } from '../helpers/nfc-ios-com-protocol';
 import { ComService } from './com.service';
 
 @Injectable({
@@ -119,9 +118,9 @@ export class TapService {
 
       try {
         //start a communication session in NFC
-        let nfcProtocol: ComProtocol;
+        let nfcProtocol:ComProtocol;
         if (this.platform.is('ios')) {
-          nfcProtocol = new NFCIosComProtocol();
+          nfcProtocol = NFCComProtocol.iOSProtocol();
         } else {
           nfcProtocol = new NFCComProtocol();
         }

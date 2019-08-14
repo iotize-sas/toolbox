@@ -202,7 +202,7 @@ export class HomePage implements OnInit{
     this.stopScan();
   }
 
-  iOSReadNdefTag() {
-    this.nfc.iOSreadNDEFTag();
+  beginNDEFSession() {
+    this.nfc.beginNDEFSession();
   }
 }
