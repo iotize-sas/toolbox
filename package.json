@@ -29,7 +29,7 @@
     "@ionic/angular": "^4.1.0",
     "@iotize/cordova-plugin-iotize-ble": "^1.1.0-alpha.28",
     "@iotize/device-client.js": "0.0.1-alpha.98",
-    "@iotize/device-com-nfc.cordova": "file:../device-com-nfc.cordova",
+    "@iotize/device-com-nfc.cordova": "^1.0.0-alpha.11",
     "@iotize/ng-com-services": "0.0.1",
     "cordova-android": "7.1.4",
     "cordova-ios": "5.0.1",
