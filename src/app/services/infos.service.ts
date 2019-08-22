@@ -51,7 +51,7 @@ export class InfosService {
     return (await this.tapService.tap.service.device.getSerialNumber()).body();
   }
   private async getAppName() {
-    return (await this.tapService.tap.service.device.getModelName()).body();
+    return (await this.tapService.tap.service.interface.getAppName()).body();
   }
   private async getCurrentProtocol() {
     return HostProtocol[(await this.tapService.tap.service.interface.getCurrentHostProtocol()).body()];
