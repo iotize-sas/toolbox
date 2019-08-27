@@ -3,14 +3,21 @@ import { TapService } from './tap.service';
 import { Events } from '@ionic/angular';
 import { Observable, Observer } from 'rxjs';
 import { HostProtocol, TargetProtocol } from '@iotize/device-client.js/device/model';
+import { AppVersion } from '@ionic-native/app-version/ngx';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InfosService {
 
-  constructor(public tapService: TapService, public events: Events) {
+  constructor(public tapService: TapService, public events: Events, private appVersion: AppVersion) {
+    this.appVersion.getVersionNumber()
+      .then(version => {
+        this.versionNumber = version;
+      })
   }
+
+  versionNumber = '';
 
   getInfos() {
     return new Observable<{}>(observer => {

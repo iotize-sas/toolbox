@@ -33,13 +33,13 @@ export class ComService implements IoTizeComService {
     }
     const protocol = this.getselectedComService().getProtocol(device, {
       connect :{
-        timeout: 60000
+        timeout: 4000
       },
       disconnect :{
-        timeout: 60000
+        timeout: 4000
       },
       send :{
-        timeout: 600000
+        timeout: 4000
       },
     });
     return protocol;

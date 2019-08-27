@@ -4,7 +4,7 @@ import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { TargetProtocol } from '@iotize/device-client.js/device/model';
 import { NFCComProtocol } from 'plugins/cordova-plugin-iotize-device-com-nfc';
 import { SessionState } from '@iotize/device-client.js/device';
-import { BLEComProtocol } from 'plugins/cordova-plugin-iotize-ble';
+import { BLEComProtocol } from '@iotize/cordova-plugin-iotize-ble';
 import { Events, LoadingController, ToastController } from '@ionic/angular';
 import { NFCTag } from './nfc.service';
 import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
@@ -66,6 +66,7 @@ export class TapService {
         throw new Error("Tap is not configured for serial or modbus communication");
       }
         await this.tap.service.target.connect();
+        this.startKeepAliveTask();
     }
 
     disconnect(){
@@ -147,5 +148,36 @@ export class TapService {
       throw err;
       }
      
+    }
+
+    /**
+     * Starts a task that periodically calls the keepAlive method.
+     * If an error occured, check session state and try to reconnect
+     */
+
+    async startKeepAliveTask() {
+      try {
+        while (this.tap.isConnected()) {
+          await this.tap.service.interface.keepAlive();
+          await this._sleep(this.keepAlivePeriod);
+        }
+      } catch (err) {
+        console.error('Keep Alive did not respond');
+        console.error(err);
+        try {
+          await this.tap.refreshSessionState();
+        } catch (err2) {
+          console.error('refreshSessionState errored');
+          console.error(err2);
+        }
+      }
+    }
+
+    keepAlivePeriod: number = 1000;
+
+    private _sleep(milliseconds: number) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(), milliseconds);
+      });
     }
 }

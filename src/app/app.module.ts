@@ -12,6 +12,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { IotizeNgComModule } from "@iotize/ng-com-services";
 import { Keyboard } from '@ionic-native/keyboard/ngx';
 import { NFC } from '@ionic-native/nfc/ngx';
+import { AppVersion } from "@ionic-native/app-version/ngx";
 import { ComponentsModule } from './components/components.module';
 
 @NgModule({
@@ -29,7 +30,8 @@ import { ComponentsModule } from './components/components.module';
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Keyboard,
-    NFC
+    NFC,
+    AppVersion
   ],
   bootstrap: [AppComponent]
 })

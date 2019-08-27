@@ -12,6 +12,7 @@ export class InfosPage  {
   constructor(public infos: InfosService) { }
   private _subscription: Subscription;
   tapInfos: {};
+  
   ionViewWillEnter() {
     this._subscription = this.infos.getInfos().subscribe((infos) => {
       this.tapInfos = infos;
@@ -22,4 +23,5 @@ export class InfosPage  {
     this._subscription.unsubscribe();
     this.tapInfos = null;
   }
+
 }

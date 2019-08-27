@@ -5,6 +5,7 @@ import { ComService } from '../../services/com.service';
 import { Subscription } from 'rxjs';
 import { TapService } from 'src/app/services/tap.service';
 import { NfcService } from 'src/app/services/nfc.service';
+import { AbstractComProtocol } from '@iotize/device-client.js/protocol/impl/abstract-com-protocol';
 
 @Component({
   selector: 'app-home',
@@ -78,6 +79,18 @@ export class HomePage implements OnInit{
         //retry once to connect
         loader.message = 'Connecting to ' + device.name + ' second attempt';
         try {
+          console.log('trying with a bigger timeout');
+          (connectionProtocol as AbstractComProtocol).options = {
+            connect: {
+              timeout: 10000
+            },
+            disconnect: {
+              timeout: 10000
+            },
+            send: {
+              timeout: 10000
+            },
+          }
           await this.tapService.init(connectionProtocol);
           loader.dismiss();
           this.events.publish('connected');
