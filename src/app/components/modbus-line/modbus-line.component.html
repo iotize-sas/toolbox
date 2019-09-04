@@ -1,9 +1,6 @@
 <ion-grid>
   <ion-item-sliding #slidingCase *ngFor="let keyValue of modbusReadAnswers | keyvalue">
     <ion-item no-padding>
-      <ion-row>
-        <ion-icon *ngIf="isMonitored(keyValue.key)" name="play" slot="end"></ion-icon>
-      </ion-row>
       <ion-row class="grid-body">
         <ion-col size="1" class="centered">
           {{keyValue.value.config.slave}}
