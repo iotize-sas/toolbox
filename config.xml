@@ -106,6 +106,5 @@
     <plugin name="cordova-plugin-app-version" spec="0.1.9" />
     <plugin name="cordova-plugin-iotize-device-com-nfc" spec="@iotize/device-com-nfc.cordova@~1.0.0-alpha.11" />
     <plugin name="cordova-plugin-iotize-ble" spec="@iotize/cordova-plugin-iotize-ble@~1.1.0-alpha.29" />
-    <engine name="android" spec="7.1.4" />
     <engine name="ios" spec="5.0.1" />
 </widget>

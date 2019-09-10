@@ -47,5 +47,20 @@
           <ion-label position="stacked">FirmwareVersion</ion-label>
           {{tapInfos.targetFirmwareVersion? tapInfos.targetFirmwareVersion: ''}}
         </ion-item>
+        <ion-item>
+          <p>
+            Started at {{start}}
+          </p>
+          <p>  
+            count: {{count}}
+          </p>
+          <p>
+            Ended at: {{end? end: ''}}
+          </p>
+          <p>
+            Time diff: {{diff? diff: ''}};
+          </p>
+        </ion-item>
     </ion-list>
+    <ion-button (click)="launchTestTask()">TEST</ion-button>
 </ion-content>

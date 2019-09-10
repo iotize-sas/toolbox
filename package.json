@@ -31,7 +31,7 @@
     "@iotize/device-client.js": "0.0.1-alpha.98",
     "@iotize/device-com-nfc.cordova": "^1.0.0-alpha.11",
     "@iotize/ng-com-services": "0.0.1",
-    "cordova-android": "7.1.4",
+    "cordova-android": "8.0.0",
     "cordova-ios": "5.0.1",
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-app-version": "0.1.9",
@@ -90,8 +90,8 @@
       "cordova-plugin-iotize-ble": {}
     },
     "platforms": [
-      "android",
-      "ios"
+      "ios",
+      "android"
     ]
   }
 }
