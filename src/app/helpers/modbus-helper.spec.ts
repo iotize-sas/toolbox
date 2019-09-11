@@ -77,8 +77,8 @@ describe("ModbusReadAnswer", () => {
     });
 
     it("should give an unique id to each STORED instance (incrementation)", () => {
-        const instance = ModbusReadAnswer.store(MockFactory.getRandomModbusAnswerRead());
-        const instance2 = ModbusReadAnswer.store(MockFactory.getRandomModbusAnswerRead());
+        const instance = MockFactory.getRandomModbusAnswerRead();
+        const instance2 = MockFactory.getRandomModbusAnswerRead();
         console.log('instance2 ID', instance2.id, 'instance ID', instance.id);
         expect(instance2.id - instance.id).toBe(1);
     });

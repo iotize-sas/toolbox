@@ -125,10 +125,9 @@ export class MockFactory {
   static getRandNumber(min: number, max: number, except?: number | number[]) {
     let rand = Math.floor((max - min + 1) * Math.random()) + min;
     if (except) {
-      if (typeof except == 'number' && rand == except) {
-        return MockFactory.getRandNumber(min, max, except)
+      if (typeof except == 'number') {
+        return rand == except ? MockFactory.getRandNumber(min, max, except) : rand;
       }
-      console.warn(except);
       if ((except as Array<number>).includes(rand)) {// except is then an array
         return MockFactory.getRandNumber(min, max, except)
       }
@@ -192,5 +191,10 @@ export class MockFactory {
         myMap.set(_.id!, _);
       });
       return myMap;
+  }
+  static sleep(milliseconds: number): Promise<void> {
+    return new Promise(res => {
+      setTimeout( () => res() ,milliseconds);
+    });
   }
 }
