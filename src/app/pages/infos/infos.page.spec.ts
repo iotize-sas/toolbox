@@ -3,7 +3,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InfosPage } from './infos.page';
 import { of } from 'rxjs';
-import { MockFactory } from 'tests/mocks';
 import { InfosService } from 'src/app/services/infos.service';
 
 describe('InfosPage', () => {
@@ -45,6 +44,16 @@ describe('InfosPage', () => {
     component.ionViewWillEnter();
     fixture.detectChanges();
     expect(component.tapInfos).toBe(MOCKED_INFOS);
+  });
+
+  it('should clear tapInfos on viewWillLeave', async () => {
+    // Check that subscription and data exist
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(component.tapInfos).toBe(MOCKED_INFOS);
+    component.ionViewWillLeave();
+    fixture.detectChanges();
+    expect(component.tapInfos).toBeFalsy();
   });
 });
 

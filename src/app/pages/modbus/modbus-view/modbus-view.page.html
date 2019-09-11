@@ -26,17 +26,7 @@
         </ion-label>
       </ion-item-divider>
   </ion-grid>
-  <!-- <app-scroll-table *ngFor="let modbusRead of savedModbusValues; let i = index; trackBy: savedModbusTrackFn"
-    keyName="key" valueName="value" showHeader="true" [dataArray]="modbusRead | modbusData"
-    [formatFn]="formatToStringFactory(modbus.displayMode, modbusRead.format)"
-    [keyFormatFn]="formatToStringFactory(modbus.displayMode,2)" [columnSize]="{key: 4, value: 8}"
-    rightSlideButtonText="Delete" [rightSlideButtonStyle]="{'background': 'red'}"
-    (rightSlideButtonClick)="deleteLine($event)" leftSlideButtonText="Refresh" (leftSlideButtonClick)="refresh(i)">
-  </app-scroll-table>
-  <app-scroll-table keyName="key" valueName="value" showHeader="false" [dataArray]="lastModbusRead | modbusData"
-    [formatFn]="formatToStringFactory(modbus.displayMode)" [keyFormatFn]="formatToStringFactory(modbus.displayMode,2)"
-    [columnSize]="{key: 4, value: 8}" rightSlideButtonText="Keep" (rightSlideButtonClick)="keepLine($event)">
-  </app-scroll-table> -->
+
   <modbus-line [modbusReadAnswers]="modbus.savedModbusValues" [registerDisplayMode]="modbus.registerMode"
     (onDeleteClick)="deleteLine($event)"
     (onRefreshClick)="refresh($event)"

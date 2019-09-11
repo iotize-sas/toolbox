@@ -2,7 +2,6 @@ import { MockProtocol } from '@iotize/device-com-mock.js'
 import { StringConverter, NumberConverter } from '@iotize/device-client.js/client/impl';
 import { ApiRequest, Response } from "@iotize/device-client.js/client/impl";
 import { LoginCredentialConverter, InterfaceLockConverter } from '@iotize/device-client.js/device/converter/model-converters';
-import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { ModbusConfig, ModbusReadAnswer, ByteOrder, DataDisplay } from 'src/app/helpers/modbus-helper';
 import { VariableFormat, ModbusOptions } from '@iotize/device-client.js/device/model';
 
@@ -12,7 +11,7 @@ export class MockFactory {
   static USER_NAME = 'testUsername';
   static PASSWORD = 'testPassword';
 
-  static protocol(): ComProtocol {
+  static protocol(): MockProtocol {
     const mockProtocol = new MockProtocol();
 
     const setDefaultResponses = () => {
@@ -50,7 +49,7 @@ export class MockFactory {
 
       // lockInfos
       mockProtocol.addRoute(ApiRequest.GET('/1024//6'), Response.SUCCESS(
-        (new InterfaceLockConverter()).encode({
+        (new InterfaceLockConverter()).encode({ 
           factoryReset: false,
           hashPassword: false,
           resourceFactory: false,

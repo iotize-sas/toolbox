@@ -176,9 +176,9 @@ export class ModbusService {
   }
 
   private _startMonitoring(id) {
-    this._stopMonitoring(id);
+    // this._stopMonitoring(id);
     if (!this.savedModbusValues.has(id)) {
-      throw new Error('Unknown Command');
+      throw new Error(`Can't start monitoring: savedModbusValues doesn't have id ${id}`);
     }
 
     const monitoredModbusRead = this.savedModbusValues.get(id);
@@ -205,6 +205,8 @@ export class ModbusService {
     if (this._monitoredIds.has(index)) {
       this._monitoredIds.get(index).unsubscribe();
       this._monitoredIds.delete(index);
+    } else {
+      throw new Error(`Can't stop monitoring: savedModbusValues doesn't have id ${index}`);
     }
   }
 
@@ -220,6 +222,8 @@ export class ModbusService {
     if (this._monitoredIds.has(index)) {
       this._stopMonitoring(index);
       this._startMonitoring(index);
+    } else {
+      throw new Error(`Can't reset monitoring: savedModbusValues doesn't have id ${index}`);
     }
   }
 
@@ -249,14 +253,14 @@ export class ModbusService {
   
   savedModbusValues: Map<number, ModbusReadAnswer>; // Mapped by Ids
 
-  mockValues() {
+  // mockValues() {
   
-    this.lastModbusRead = new ModbusReadAnswer(
-      this.displayedModbusOptions,
-      new Uint8Array([1,2])
-      );
-      console.log(this.lastModbusRead);
-    }
+  //   this.lastModbusRead = new ModbusReadAnswer(
+  //     this.displayedModbusOptions,
+  //     new Uint8Array([1,2])
+  //     );
+  //     console.log(this.lastModbusRead);
+  //   }
 
 }
 

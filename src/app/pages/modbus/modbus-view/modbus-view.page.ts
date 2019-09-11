@@ -31,7 +31,7 @@ export class ModbusViewPage implements OnInit {
     private keyboard: Keyboard) { }
 
   ngOnInit() {
-    console.log('[TerminalViewPage] init');
+    console.log('[ModbusViewPage] init');
     if (!this.modbus.settings.didFetchSettings) {
       this.modbus.settings.getUARTSettings();
     }
@@ -55,10 +55,6 @@ export class ModbusViewPage implements OnInit {
     return this.send(data);
   }
 
-  // clear() {
-  //   // this.logLines.splice(0);
-  // }
-
   async openSettingsModal() {
     let _this = this;
     const modal = await this.modalController.create({
@@ -71,35 +67,6 @@ export class ModbusViewPage implements OnInit {
 
     return await modal.present();
   }
-
-  // formatToStringFactory(displayAs: 'HEX' | 'DEC', format?: VariableFormat) {
-  //   if (displayAs === 'DEC') {
-  //     return function (val) {
-  //       return val;
-  //     };
-  //   } else {
-  //     const _this = this;
-  //     if (!format) {
-  //       if (this.modbus.lastModbusRead && this.modbus.lastModbusRead.config && this.modbus.lastModbusRead.config.format)
-  //       format = this.modbus.lastModbusRead.config.format;
-  //     } else {
-  //       format = VariableFormat._16_BITS;
-  //     }
-  //     return function (val) {
-  //       return _this.formatToStringClosure(val, format);
-  //     };
-  //   }
-  // }
-
-  // formatToStringClosure(value, format) {
-  //   if (format !== 0) {
-  //     let result = value.toString(16).toUpperCase();
-  //     result = '0000000' + result;
-  //     result = '0x' + result.slice(-(2 ** format));
-  //     return result;
-  //   }
-  //   return !!value;
-  // }
 
   async read() {
     try {
@@ -147,10 +114,6 @@ export class ModbusViewPage implements OnInit {
     } catch (error) {
       this.showError(error);
     }
-  }
-
-  savedModbusTrackFn(index, item) {
-    return index;
   }
 
   showError(error) {
