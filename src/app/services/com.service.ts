@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from '@iotize/ng-com-services';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, pipe, from } from 'rxjs';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { Events } from '@ionic/angular';
+import { timeout, first, finalize, filter } from 'rxjs/operators';
 
 export type AvailableCom = "BLE" | "NFC" | "WIFI";
 
@@ -12,12 +13,12 @@ export type AvailableCom = "BLE" | "NFC" | "WIFI";
 export class ComService implements IoTizeComService {
 
   private selectedCom: AvailableCom = "BLE";
-  public  selectedDevice?: DiscoveredDeviceType;
-  
+  public selectedDevice?: DiscoveredDeviceType;
+
   constructor(private ble: IoTizeBle, public events: Events) {
     this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => this.selectedDevice = tag);
   }
-  
+
   startScan(): Observable<DiscoveredDeviceType> {
     return this.getselectedComService().startScan();
   }
@@ -32,13 +33,13 @@ export class ComService implements IoTizeComService {
       this.selectedDevice = device as DiscoveredDeviceType;
     }
     const protocol = this.getselectedComService().getProtocol(device, {
-      connect :{
+      connect: {
         timeout: 60000
       },
-      disconnect :{
+      disconnect: {
         timeout: 60000
       },
-      send :{
+      send: {
         timeout: 600000
       },
     });
@@ -46,7 +47,7 @@ export class ComService implements IoTizeComService {
   }
 
   private getselectedComService(): IoTizeComService {
-    switch(this.selectedCom) {
+    switch (this.selectedCom) {
       case "BLE":
         return this.ble;
       default:
@@ -75,42 +76,16 @@ export class ComService implements IoTizeComService {
     this.getselectedComService().clearDevices(except);
   }
 
-  private _scanForSpecificDeviceObservable(deviceName: string) {
-    return new Observable<DiscoveredDeviceType>(observer => {
-      this.ble.startScan().subscribe(device => {
-        console.log('found ')
-        if (device.name == deviceName) {
-          this.ble.stopScan();
-          observer.next(device);
-          observer.complete();
-        }
-      },
-      error => {
-        this.ble.stopScan();
-        observer.error(error);
-      }
-        ,
-      () => {
-        this.ble.stopScan();
-        observer.complete();
-      });
-    });
+  private _scanForSpecificDeviceObservable(deviceNameOrAddress: string, timeOut = 1000) {
+    return this.ble.startScan().pipe(
+      timeout(timeOut),
+      filter(_ => _.name == deviceNameOrAddress || _.address == deviceNameOrAddress),
+      first(),
+      finalize(() => this.stopScan())
+    )
   }
-  
-  async scanForSpecificDevice(deviceName: string): Promise<DiscoveredDeviceType> {
-    let scanSubscription: Subscription;
-    return new Promise<DiscoveredDeviceType> ((resolve, reject) => {
-      setTimeout(() => {
-        if (scanSubscription) {
-          scanSubscription.unsubscribe();
-          reject('scanForSpecificDevice timeout');
-        }
-      }, 10000) // 10 seconds timeout on device scan
 
-      scanSubscription = this._scanForSpecificDeviceObservable(deviceName).subscribe(
-        device => resolve(device),
-        error => reject(error)
-      );
-    });
+  async scanForSpecificDevice(deviceName: string, timeOut?: number): Promise<DiscoveredDeviceType> {
+    return this._scanForSpecificDeviceObservable(deviceName, timeOut).toPromise();
   }
 }

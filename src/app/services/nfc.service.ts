@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { NFC, NdefEvent } from '@ionic-native/nfc/ngx'
 import { Events, Platform } from '@ionic/angular';
 import { Observable, fromEvent } from 'rxjs';
+import { IoTizeComService } from '@iotize/ng-com-services';
+import { DiscoveredDeviceType } from 'plugins/cordova-plugin-iotize-ble';
+import { NFCComProtocol } from '@iotize/device-com-nfc.cordova';
+import { ComProtocolOptions, ComProtocol } from '@iotize/device-client.js/protocol/api';
 
 declare var nfc;
 
@@ -13,7 +17,7 @@ export interface NFCTag {
 @Injectable({
   providedIn: 'root'
 })
-export class NfcService {
+export class NfcService implements IoTizeComService {
 
   private isListening = false;
 
@@ -145,6 +149,30 @@ export class NfcService {
     console.log('addNdefListener called');
     return fromEvent(document, 'ndef');
 
+  }
+
+  startScan(): Observable<DiscoveredDeviceType> {
+    throw new Error('not Implemented');
+  }
+  
+  checkAvailable(): Promise<void> {
+    throw new Error('not Implemented');
+  }
+  stopScan(): void | Promise<void> {
+    throw new Error('not Implemented');
+  }
+  getProtocol(device: any, options?: ComProtocolOptions): ComProtocol {
+    if (this.platform.is('ios')) {
+      return NFCComProtocol.iOSProtocol();
+    }
+    return new NFCComProtocol();
+  }
+
+  devicesArray(): Observable<DiscoveredDeviceType[]> {
+    throw new Error('not Implemented');
+  }
+  clearDevices(except?: DiscoveredDeviceType[]): void {
+    throw new Error('not Implemented');
   }
 }
 
