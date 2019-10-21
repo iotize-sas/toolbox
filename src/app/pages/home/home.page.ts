@@ -5,6 +5,8 @@ import { ComService } from '../../services/com.service';
 import { Subscription } from 'rxjs';
 import { TapService } from 'src/app/services/tap.service';
 import { NfcService } from 'src/app/services/nfc.service';
+import { groupBy, map } from 'rxjs/operators';
+import { RssiToBarsPipe } from 'src/app/pipes/rssiToBars/rssi-to-bars.pipe';
 
 @Component({
   selector: 'app-home',
@@ -28,27 +30,39 @@ export class HomePage implements OnInit{
     this.nfc.forceMimeHandle();
     this.nfcPairingSubscribe();
     this.events.subscribe('connected', () => this.changeDetector.detectChanges());
-    this.isIOS = this.platform.is("ios");
   }
 
   devices: DiscoveredDeviceType[] = [];
   private deviceArraySubscription: Subscription;
   private deviceArraySubscribe() {
+    const rssiPipe = new RssiToBarsPipe();
     this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => {
-      this.devices = arr.sort((a, b) => b.rssi - a.rssi);
+      this.devices = arr.sort((a, b) => rssiPipe.transform(b.rssi) - rssiPipe.transform(a.rssi));
       console.log('new deviceArray, detecting changes');
       this.changeDetector.detectChanges();
     });
   }
-  isIOS: boolean;
+  get isIOS() {
+    return this.platform.is('ios');
+  }
+
+  get isScanning() {
+    return this.comService.isScanning
+  }
+
+  get scanMessage() {
+    return `${this.isScanning? 'Stop' : 'Start'} Scan`;
+  }
+
   startScan() {
-    this.comService.startScan().subscribe({ error: err => this.handleError(err) });
-    // .subscribe(
-    //   device => {
-    //     console.log(device);
-    //       this.devices.push(device);
-    //       this.changeDetector.detectChanges();
-    //   });
+    this.comService.startScan();
+  }
+
+  toggleScan() {
+    if (this.isScanning) {
+      return this.stopScan();
+    }
+    return this.startScan();
   }
 
   async stopScan() {
@@ -69,7 +83,7 @@ export class HomePage implements OnInit{
 
     const connectionProtocol = this.comService.getProtocol(device);
     try {
-      await this.tapService.init(connectionProtocol);
+      await this.tapService.init(connectionProtocol, device);
       loader.dismiss();
       this.events.publish('connected');
       this.showToast('Connected to ' + device.name);
@@ -79,7 +93,7 @@ export class HomePage implements OnInit{
         //retry once to connect
         loader.message = 'Connecting to ' + device.name + ' second attempt';
         try {
-          await this.tapService.init(connectionProtocol);
+          await this.tapService.init(connectionProtocol, device);
           loader.dismiss();
           this.events.publish('connected');
           this.showToast('Connected to ' + device.name);
@@ -114,14 +128,11 @@ export class HomePage implements OnInit{
       }
     }
     loader.dismiss();
-    this.comService.selectedDevice = null;
-    this.events.publish('disconnected');
     this.changeDetector.detectChanges();
   }
 
   clear() {
     this.deviceArraySubscription.unsubscribe();
-    this.comService.clearDevices();
     this.deviceArraySubscribe();
   }
 
@@ -178,11 +189,7 @@ export class HomePage implements OnInit{
   }
 
   isConnected(device: DiscoveredDeviceType) {
-    let isConnected = false;
-    if (this.tapService.isReady && this.comService.selectedDevice) {
-      isConnected = device.address == this.comService.selectedDevice.address
-    }
-    return isConnected;
+    return this.tapService.isConnected(device);
   }
 
   nfcPairingSubscribe() {

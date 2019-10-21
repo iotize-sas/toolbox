@@ -3,12 +3,12 @@ import { IoTizeTap } from '@iotize/ng-com-services';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { TargetProtocol } from '@iotize/device-client.js/device/model';
 import { NFCComProtocol } from '@iotize/device-com-nfc.cordova';
-import { SessionState } from '@iotize/device-client.js/device';
-import { BLEComProtocol, DiscoveredDeviceType } from '@iotize/cordova-plugin-iotize-ble';
+import { DiscoveredDeviceType } from '@iotize/cordova-plugin-iotize-ble';
 import { Events, LoadingController, ToastController, Platform } from '@ionic/angular';
 import { NFCTag } from './nfc.service';
 import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
 import { ComService } from './com.service';
+import { Subscription, timer } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -24,25 +24,31 @@ export class TapService {
     return this.iotizeTap.sessionStateForceUpdate();
   }
 
+  private selectedDevice?: DiscoveredDeviceType;
+
   constructor(public iotizeTap: IoTizeTap,
     public events: Events,
     public loading: LoadingController,
     public toast: ToastController,
     public platform: Platform,
     public com: ComService) { 
+    this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => this.selectedDevice = tag);
     this.events.subscribe('tag-discovered', (tag: NFCTag) => {
       if (!this.tap || !this.tap.isConnected() || !this.isReady) {
         this.NFCLoginAndBLEPairing(tag).then(() => {
           this.events.publish('connected', tag.appName);
+
         });
       }
     });
+
+    this._handleAppClosing();
   }
     get tap() {
       return this.iotizeTap.tap;
     }
 
-    async init(comProtocol: ComProtocol){
+    async init(comProtocol: ComProtocol, selectedDevice?: DiscoveredDeviceType){
       try {
         await this.iotizeTap.init(comProtocol);
       } catch (err) {
@@ -64,6 +70,7 @@ export class TapService {
         }
       } catch (err) {
         console.error('[TapService] ', err.message? err.message: err);
+        return this.disconnect();
       // throw err;
       }
       const protocol = (await this.tap.service.target.getProtocol()).body();
@@ -72,16 +79,34 @@ export class TapService {
         throw new Error("Tap is not configured for serial or modbus communication");
       }
         await this.tap.service.target.connect();
+        if (selectedDevice) {
+          this.selectedDevice = selectedDevice
+        }
+        this.keepAliveRoutine();
     }
 
-    disconnect(){
-      if (this.tap) {
-        return this.tap.disconnect();
+    async disconnect(){
+      if (this._keepAliveSubscription) {
+        this._keepAliveSubscription.unsubscribe(); // stops keepAlive periodic polling
       }
+      if (this.tap) {
+        try {
+          await this.tap.disconnect();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      this.selectedDevice = null;
+      this.events.publish('disconnected');
+
     }
 
     get isReady() {
       return this.iotizeTap.isReady;
+    }
+
+    get isIOS() {
+      return this.platform.is('ios');
     }
 
     login(user: string, password: string) {
@@ -119,44 +144,50 @@ export class TapService {
       try {
         //start a communication session in NFC
         let nfcProtocol:ComProtocol;
-        if (this.platform.is('ios')) {
+        if (this.isIOS) {
           nfcProtocol = NFCComProtocol.iOSProtocol();
         } else {
           nfcProtocol = new NFCComProtocol();
         }
         await this.init(nfcProtocol);
+
+        //NFC Pairing
+
+        await this.tap.nfcPairing();
         
-        //enable NFC auto login
-        await this.tap.encryption(true);
+        //enable encryption (and NFC auto login if available)
+        await this.tap.encryption(true, true);
+
         
         //check the user login
-        let sessionState: SessionState = await this.tap.refreshSessionState();
-        const nfcSessionStateString =  JSON.stringify(sessionState);
-        console.log(`NFCLoginAndBLEPairing in NFC:  ` + nfcSessionStateString);
+        // let sessionState: SessionState = await this.tap.refreshSessionState();
+        // const nfcSessionStateString =  JSON.stringify(sessionState);
+        // console.log(`NFCLoginAndBLEPairing in NFC:  ` + nfcSessionStateString);
 
-        loader.message = `Logged as ${sessionState.name}, switching to BLE`;
+        // loader.message = `Logged as ${sessionState.name}, switching to BLE`;
         
+
         let realDevice;
         //connect to the device in BLE
-        if (this.platform.is('ios')) {
+        if (this.isIOS) {
           realDevice = await this.com.scanForSpecificDevice(discoveredDevice.name);
         } else {
           realDevice = discoveredDevice;
         }
 
-        let bleCom : ComProtocol = new BLEComProtocol(realDevice.address, bleOptions);
+        let bleCom : ComProtocol = this.com.getProtocol(realDevice.address, bleOptions);
         //start the BLE communication with the device
         await this.tap.useComProtocol(bleCom).connect();
         
-        if (this.platform.is('ios')) {
+        if (this.isIOS) {
           console.log('Close NFC Session');
           nfcProtocol.disconnect(); // End NFC reading session
         }
 
         //check the connection
-        sessionState = await this.tap.refreshSessionState();
-        const bleSessionStateString = JSON.stringify(sessionState);
-        console.log(`NFCLoginAndBLEPairing in BLE:  `+ bleSessionStateString);
+        // sessionState = await this.tap.refreshSessionState();
+        // const bleSessionStateString = JSON.stringify(sessionState);
+        // console.log(`NFCLoginAndBLEPairing in BLE:  `+ bleSessionStateString);
 
         this.events.publish('NFCPairing', realDevice);
         loader.dismiss();
@@ -168,13 +199,13 @@ export class TapService {
           
           let realDevice;
           //connect to the device in BLE
-          if (this.platform.is('ios')) {
+          if (this.isIOS) {
             realDevice = await this.com.scanForSpecificDevice(discoveredDevice.name);
           } else {
             realDevice = discoveredDevice;
           }
 
-          let bleCom : ComProtocol = new BLEComProtocol(realDevice, bleOptions);
+          let bleCom : ComProtocol = this.com.getProtocol(realDevice, bleOptions);
           //start the BLE communication with the device
           await this.init(bleCom);
           this.events.publish('NFCPairing', realDevice);
@@ -192,5 +223,36 @@ export class TapService {
       throw err;
       }
      
+    }
+
+    isConnected(device: DiscoveredDeviceType) {
+      let isConnected = false;
+      if (this.isReady && this.selectedDevice) {
+        isConnected = device.address == this.selectedDevice.address
+      }
+      return isConnected;
+    }
+
+    private _keepAliveSubscription?: Subscription;
+    keepAliveRoutine(period: number = 1000) {
+      if (this._keepAliveSubscription) {
+        this._keepAliveSubscription.unsubscribe();
+      }
+      this._keepAliveSubscription = timer(0, period).subscribe(
+        () => {
+          if (this.tap.isConnected) {
+            this.tap.service.interface.keepAlive();
+          }
+        }
+      )
+    }
+
+    private _handleAppClosing() {
+      window.addEventListener('beforeunload', () => {
+        if (this.selectedDevice) {
+          console.log('disconnecting from', this.selectedDevice.name);
+          this.disconnect();
+        }
+      });
     }
 }

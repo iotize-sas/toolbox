@@ -1,86 +1,78 @@
 import { Injectable } from '@angular/core';
-import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from '@iotize/ng-com-services';
+// import { IoTizeComService, IoTizeBle, DiscoveredDeviceType } from '@iotize/ng-com-services';
 import { Observable, Subscription, pipe, from } from 'rxjs';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { Events } from '@ionic/angular';
-import { timeout, first, finalize, filter } from 'rxjs/operators';
+import { timeout, first, finalize, filter, find, map } from 'rxjs/operators';
+import { CordovaInterface, BLEComProtocol, BLEScanner, DiscoveredDeviceType } from '@iotize/cordova-plugin-iotize-ble';
+
+declare var iotizeBLE: CordovaInterface;
 
 export type AvailableCom = "BLE" | "NFC" | "WIFI";
 
 @Injectable({
   providedIn: 'root'
 })
-export class ComService implements IoTizeComService {
+export class ComService
+// implements IoTizeComService 
+{
 
   private selectedCom: AvailableCom = "BLE";
-  public selectedDevice?: DiscoveredDeviceType;
+  private _scanner: BLEScanner
 
-  constructor(private ble: IoTizeBle, public events: Events) {
-    this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => this.selectedDevice = tag);
+  constructor(public events: Events) {
+    this._scanner = new BLEScanner();
   }
 
-  startScan(): Observable<DiscoveredDeviceType> {
-    return this.getselectedComService().startScan();
+  startScan(): void {
+    this._scanner.start();
   }
   checkAvailable(): Promise<void> {
-    return this.getselectedComService().checkAvailable();
-  }
-  stopScan(): void | Promise<void> {
-    return this.getselectedComService().stopScan();
-  }
-  getProtocol(device: any): ComProtocol {
-    if (device.name) {
-      this.selectedDevice = device as DiscoveredDeviceType;
-    }
-    const protocol = this.getselectedComService().getProtocol(device, {
-      connect: {
-        timeout: 60000
-      },
-      disconnect: {
-        timeout: 60000
-      },
-      send: {
-        timeout: 600000
-      },
+    return new Promise<void>((resolve, reject) => {
+      iotizeBLE.checkAvailable(
+        _ => resolve(),
+        error => reject(error)
+      );
     });
+  }
+
+  stopScan(): void | Promise<void> {
+    return this._scanner.stop();
+  }
+  getProtocol(device: DiscoveredDeviceType | string, options?): ComProtocol {
+    const protocol = new BLEComProtocol(typeof device == "object"? device.address : device, options);
     return protocol;
   }
 
-  private getselectedComService(): IoTizeComService {
-    switch (this.selectedCom) {
-      case "BLE":
-        return this.ble;
-      default:
-        throw new Error("Specified comService not implemented");
-    }
-  }
+  // private getselectedComService(): IoTizeComService {
+  //   switch (this.selectedCom) {
+  //     case "BLE":
+  //       return this.ble;
+  //     default:
+  //       throw new Error("Specified comService not implemented");
+  //   }
+  // }
 
   get isScanning() {
-    let isScanning: boolean = false;
-    switch (this.selectedCom) {
-      case "BLE":
-        isScanning = this.ble.isScanning;
-        break;
-    }
-    return isScanning;
+    return this._scanner.isScanning
   }
 
   devicesArray(): Observable<DiscoveredDeviceType[]> {
-    return this.getselectedComService().devicesArray();
+    return this._scanner.results
   }
-  clearDevices(): void {
-    const except = [];
-    if (!!this.selectedDevice) {
-      except.push(this.selectedDevice);
-    }
-    this.getselectedComService().clearDevices(except);
-  }
+  // clearDevices(): void {
+  //   const except = [];
+  //   if (!!this.selectedDevice) {
+  //     except.push(this.selectedDevice);
+  //   }
+  //   this.getselectedComService().clearDevices(except);
+  // }
 
   private _scanForSpecificDeviceObservable(deviceNameOrAddress: string, timeOut = 1000) {
-    return this.ble.startScan().pipe(
+    return this._scanner.results.pipe(
       timeout(timeOut),
-      filter(_ => _.name == deviceNameOrAddress || _.address == deviceNameOrAddress),
-      first(),
+      find(array => array.find( _ => _.name == deviceNameOrAddress || _.address == deviceNameOrAddress) !== undefined),
+      map(array => array.find( _ => _.name == deviceNameOrAddress || _.address == deviceNameOrAddress)),
       finalize(() => this.stopScan())
     )
   }

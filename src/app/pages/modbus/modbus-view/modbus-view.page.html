@@ -73,10 +73,6 @@
   </ion-grid>
 </ion-content>
 <ion-footer>
-  <div *ngIf="lastError">
-    {{lastError.message}}
-    {{lastError.time}}
-  </div>
   <ion-grid class="clickable smaller-text options-footer">
     <ion-row (click)="openSettingsModal()">
       <ion-col size="1" offset="11">
