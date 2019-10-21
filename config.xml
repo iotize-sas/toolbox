@@ -11,6 +11,7 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <preference name="AndroidLaunchMode" value="singleTask" />
     <preference name="ScrollEnabled" value="false" />
     <preference name="android-minSdkVersion" value="19" />
     <preference name="android-targetSdkVersion" value="28" />
@@ -104,8 +105,5 @@
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.0.5" />
     <plugin name="cordova-plugin-add-swift-support" spec="^2.0.2" />
     <plugin name="cordova-plugin-app-version" spec="0.1.9" />
-    <plugin name="cordova-plugin-iotize-device-com-nfc" spec="@iotize/device-com-nfc.cordova@~1.0.0-alpha.11" />
-    <plugin name="cordova-plugin-iotize-ble" spec="@iotize/cordova-plugin-iotize-ble@~1.1.0-alpha.29" />
-    <engine name="android" spec="7.1.4" />
     <engine name="ios" spec="5.0.1" />
 </widget>

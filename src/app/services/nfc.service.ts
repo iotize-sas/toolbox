@@ -146,6 +146,9 @@ export class NfcService implements IoTizeComService {
 
   addNdefListener(onSuccess?: Function, onFailure?: Function): Observable<any> {
 
+    if (this.platform.is('android')) {
+      return this.nfc.addNdefListener(onSuccess, onFailure);
+    }
     console.log('addNdefListener called');
     return fromEvent(document, 'ndef');
 
