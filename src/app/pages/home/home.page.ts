@@ -5,7 +5,6 @@ import { ComService } from '../../services/com.service';
 import { Subscription } from 'rxjs';
 import { TapService } from 'src/app/services/tap.service';
 import { NfcService } from 'src/app/services/nfc.service';
-import { groupBy, map } from 'rxjs/operators';
 import { RssiToBarsPipe } from 'src/app/pipes/rssiToBars/rssi-to-bars.pipe';
 
 @Component({
@@ -29,7 +28,9 @@ export class HomePage implements OnInit{
     // this.nfc.listenNFC();
     this.nfc.forceMimeHandle();
     this.nfcPairingSubscribe();
-    this.events.subscribe('connected', () => this.changeDetector.detectChanges());
+    this.tapService.connectionState.subscribe(
+       () => this.changeDetector.detectChanges() // refresh view each time a connection state updates
+       ); 
   }
 
   devices: DiscoveredDeviceType[] = [];
@@ -85,7 +86,6 @@ export class HomePage implements OnInit{
     try {
       await this.tapService.init(connectionProtocol, device);
       loader.dismiss();
-      this.events.publish('connected');
       this.showToast('Connected to ' + device.name);
       this.changeDetector.detectChanges();
     } catch (error) {
@@ -95,7 +95,6 @@ export class HomePage implements OnInit{
         try {
           await this.tapService.init(connectionProtocol, device);
           loader.dismiss();
-          this.events.publish('connected');
           this.showToast('Connected to ' + device.name);
           this.changeDetector.detectChanges();
           return;

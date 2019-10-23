@@ -3,6 +3,7 @@ import { UartSettings, ModbusOptions, VariableFormat } from '@iotize/device-clie
 import { TapService } from './tap.service';
 import { Events } from '@ionic/angular';
 import { ResultCode, ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
+import { ConnectionState } from '@iotize/device-client.js/protocol/api';
 
 @Injectable({
   providedIn: 'root'
@@ -162,13 +163,18 @@ if (!triedReconnection){
   }
 
   eventSubscribe() {
-    this.events.subscribe('connected', () => this.getUARTSettings().catch(error => this.events.publish('error-message', error.message)));
+    this.tapService.connectionState.subscribe(state => {
+      if (state == ConnectionState.CONNECTED)
+        return this.getUARTSettings().catch(error => this.events.publish('error-message', error.message))
+
+      if (state == ConnectionState.DISCONNECTED)
+      this.didFetchSettings = false
+    });
     this.events.subscribe('logged-in', () => {
       if (!this.didFetchSettings) {
         this.getUARTSettings().catch(error => this.events.publish('error-message', error.message))
       }
     });
-    this.events.subscribe('disconnected', () => this.didFetchSettings = false);
   }
 
   async handleDisconnection() {

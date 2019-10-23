@@ -31,7 +31,7 @@ export class TerminalService {
   async send(data: string) {
     try {
       if (!this.tapService.isReady) {
-        this.events.publish('disconnected');
+        // this.events.publish('disconnected');
         return;
       }
       const dataArray = this.stringToData(data);

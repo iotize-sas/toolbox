@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IoTizeTap } from '@iotize/ng-com-services';
-import { ComProtocol } from '@iotize/device-client.js/protocol/api';
+import { ComProtocol, ConnectionState } from '@iotize/device-client.js/protocol/api';
 import { TargetProtocol } from '@iotize/device-client.js/device/model';
 import { NFCComProtocol } from '@iotize/device-com-nfc.cordova';
 import { DiscoveredDeviceType } from '@iotize/cordova-plugin-iotize-ble';
@@ -8,7 +8,7 @@ import { Events, LoadingController, ToastController, Platform } from '@ionic/ang
 import { NFCTag } from './nfc.service';
 import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
 import { ComService } from './com.service';
-import { Subscription, timer } from 'rxjs';
+import { Subscription, timer, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,23 +32,24 @@ export class TapService {
     public toast: ToastController,
     public platform: Platform,
     public com: ComService) { 
+
+    this._connectionState$ = new BehaviorSubject(ConnectionState.DISCONNECTED);
+    // Save the currently connected tap on NFC Pairing
     this.events.subscribe('NFCPairing', (tag: DiscoveredDeviceType) => this.selectedDevice = tag);
+    // Allow new connection if a TAP has been discovered and no tap is connected
     this.events.subscribe('tag-discovered', (tag: NFCTag) => {
       if (!this.tap || !this.tap.isConnected() || !this.isReady) {
-        this.NFCLoginAndBLEPairing(tag).then(() => {
-          this.events.publish('connected', tag.appName);
-
-        });
+        this.NFCLoginAndBLEPairing(tag);
       }
     });
-
+    
     this._handleAppClosing();
   }
     get tap() {
       return this.iotizeTap.tap;
     }
 
-    async init(comProtocol: ComProtocol, selectedDevice?: DiscoveredDeviceType){
+    async init(comProtocol: ComProtocol, selectedDevice?: DiscoveredDeviceType, nfcPairing = false){
       try {
         await this.iotizeTap.init(comProtocol);
       } catch (err) {
@@ -62,27 +63,31 @@ export class TapService {
         }
       }
       // Disconnect from target, check for current protocol and connect if Modbus or Serial is available
-      try {
-        const response = await this.tap.service.target.disconnect();
-        if (!response.isSuccessful()) {
-          this.disconnect();
-          throw new Error(ResultCodeTranslation[response.codeRet()]);
-        }
-      } catch (err) {
-        console.error('[TapService] ', err.message? err.message: err);
-        return this.disconnect();
-      // throw err;
-      }
-      const protocol = (await this.tap.service.target.getProtocol()).body();
-      if (protocol !== TargetProtocol.MODBUS && protocol !== TargetProtocol.SERIAL_STANDARD && protocol !== TargetProtocol.SERIAL_VIA_TAPNPASS) {
-        await this.disconnect();
-        throw new Error("Tap is not configured for serial or modbus communication");
-      }
-        await this.tap.service.target.connect();
+      // try {
+      //   const response = await this.tap.service.target.disconnect();
+      //   if (!response.isSuccessful()) {
+      //     this.disconnect();
+      //     throw new Error(ResultCodeTranslation[response.codeRet()]);
+      //   }
+      // } catch (err) {
+      //   console.error('[TapService] ', err.message? err.message: err);
+      //   return this.disconnect();
+      // // throw err;
+      // }
+      // const protocol = (await this.tap.service.target.getProtocol()).body();
+      // if (protocol !== TargetProtocol.MODBUS && protocol !== TargetProtocol.SERIAL_STANDARD && protocol !== TargetProtocol.SERIAL_VIA_TAPNPASS) {
+      //   await this.disconnect();
+      //   throw new Error("Tap is not configured for serial or modbus communication");
+      // }
+        // await this.tap.service.target.connect();
         if (selectedDevice) {
           this.selectedDevice = selectedDevice
         }
-        this.keepAliveRoutine();
+
+        if (!nfcPairing) { // if init is called while nfc pairing, launch keep alive and sync connection state after switching to BLE
+          this.initConnectionStateObservable();
+          this.keepAliveRoutine();
+        }
     }
 
     async disconnect(){
@@ -97,8 +102,8 @@ export class TapService {
         }
       }
       this.selectedDevice = null;
-      this.events.publish('disconnected');
-
+      if (this._connectionState$.value != ConnectionState.DISCONNECTED)
+        this._connectionState$.next(ConnectionState.DISCONNECTED);
     }
 
     get isReady() {
@@ -149,7 +154,7 @@ export class TapService {
         } else {
           nfcProtocol = new NFCComProtocol();
         }
-        await this.init(nfcProtocol);
+        await this.init(nfcProtocol, undefined, true);
 
         //NFC Pairing
 
@@ -183,6 +188,9 @@ export class TapService {
           console.log('Close NFC Session');
           nfcProtocol.disconnect(); // End NFC reading session
         }
+
+        this.initConnectionStateObservable();
+        this.keepAliveRoutine();
 
         //check the connection
         // sessionState = await this.tap.refreshSessionState();
@@ -227,7 +235,7 @@ export class TapService {
 
     isConnected(device: DiscoveredDeviceType) {
       let isConnected = false;
-      if (this.isReady && this.selectedDevice) {
+      if (this.tap && this.tap.isConnected() && this.selectedDevice) {
         isConnected = device.address == this.selectedDevice.address
       }
       return isConnected;
@@ -240,8 +248,13 @@ export class TapService {
       }
       this._keepAliveSubscription = timer(0, period).subscribe(
         () => {
-          if (this.tap.isConnected) {
-            this.tap.service.interface.keepAlive();
+          if (this.tap.isConnected()) {
+            this.tap.service.interface.keepAlive().catch(
+              err => {
+                if (err.code && err.code == "ConnectionError")
+                  this.disconnect();
+              }
+            );
           }
         }
       )
@@ -254,5 +267,25 @@ export class TapService {
           this.disconnect();
         }
       });
+    }
+
+    get connectionState() {
+      return this._connectionState$.asObservable();
+    }
+
+    private _connectionState$: BehaviorSubject<ConnectionState>
+    private _connectionStateSubscription
+
+    private initConnectionStateObservable() {
+      if (this._connectionStateSubscription) {
+        this._connectionStateSubscription.unsubscribe();
+      }
+      if (this.tap.protocol) {
+        this._connectionState$.next(this.tap.protocol.getConnectionState());
+        this._connectionStateSubscription = this.tap.protocol.onConnectionStateChange().subscribe(
+          event => this._connectionState$.next(event.newState)
+        );
+      }
+
     }
 }

@@ -13,8 +13,7 @@ export class TerminalPage {
     public events: Events,
     public changeDetector: ChangeDetectorRef,
     public toast: ToastController) {
-      this.events.subscribe('connected', () => this.changeDetector.detectChanges());
-      this.events.subscribe('disconnected', () => this.changeDetector.detectChanges());
+      this.terminal.tapService.connectionState.subscribe(() => this.changeDetector.detectChanges());
       this.events.subscribe('error-message', message => this.showToast(message));
   }
   @ViewChild(IonTabs) tabs: IonTabs;
