@@ -5,6 +5,8 @@ import { LoginCredentialConverter, InterfaceLockConverter } from '@iotize/device
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { ModbusConfig, ModbusReadAnswer, ByteOrder, DataDisplay } from 'src/app/helpers/modbus-helper';
 import { VariableFormat, ModbusOptions } from '@iotize/device-client.js/device/model';
+import { timer } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export class MockFactory {
 
@@ -168,7 +170,7 @@ export class MockFactory {
   }
 
   static getBytes(rand: boolean = false) {
-     let buffer = Uint8Array.from([0, 1, 2, 3]);
+    let buffer = Uint8Array.from([0, 1, 2, 3]);
     if (rand) {
       buffer = buffer.map(_ => Math.floor(256 * Math.random()));
     }
@@ -179,22 +181,79 @@ export class MockFactory {
     return ModbusReadAnswer.store(new ModbusReadAnswer(MockFactory.getRandModbusConfig(), MockFactory.getBytes(true)));
   }
 
-  static getRandomModbusAnswersMap(size: number = 4):  Map<number,ModbusReadAnswer> {
+  static getRandomModbusAnswersMap(size: number = 4): Map<number, ModbusReadAnswer> {
     if (size <= 0) {
       size = 0;
     }
-    const myMap = new Map<number,ModbusReadAnswer>();
+    const myMap = new Map<number, ModbusReadAnswer>();
     (new Array(size))
       .fill(0)
       .map(_ => MockFactory.getRandomModbusAnswerRead())
       .forEach(_ => {
         myMap.set(_.id!, _);
       });
-      return myMap;
+    return myMap;
   }
   static sleep(milliseconds: number): Promise<void> {
     return new Promise(res => {
-      setTimeout( () => res() ,milliseconds);
+      setTimeout(() => res(), milliseconds);
     });
   }
+
+  static getModbusService() {
+    return {
+      settings: {
+        didFetchSettings: false,
+        getUARTSettings: function () {
+          return timer(1000).pipe(
+            map(() => {
+              this.didFetchSettings = true;
+            })).toPromise()
+        }
+      },
+      displayOptions: {
+        displayAs: DataDisplay.HEX,
+        byteOrder: ByteOrder.B3_B2_B1_B0
+      },
+      displayedModbusOptions: new ModbusConfig(
+        {
+          address: 0,
+          slave: 1,
+          format: VariableFormat._16_BITS,
+          length: 1,
+          objectType: ModbusOptions.ObjectType.DEFAULT
+        },
+        {
+          displayAs: DataDisplay.HEX,
+          byteOrder: ByteOrder.B3_B2_B1_B0
+        }
+      ),
+      registerMode: 'HEX',
+      isReady: true,
+
+      savedModbusOptions: {},
+  
+      saveOptions: function() {
+        this.savedModbusOptions = this.displayedModbusOptions.clone();
+      },
+
+      canSend() {
+        return true;
+      },
+      keepLine(){}
+     }
+
+  }
+  
+  static getModalController() {
+    return {
+      create: (...args) => {
+        console.log("Creating mock modal");
+        let modal = {
+          present: () => true
+        }
+        return modal;
+      }
+    } 
+}
 }

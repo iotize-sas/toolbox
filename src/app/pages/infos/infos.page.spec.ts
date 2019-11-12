@@ -3,7 +3,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InfosPage } from './infos.page';
 import { of } from 'rxjs';
-import { MockFactory } from 'tests/mocks';
 import { InfosService } from 'src/app/services/infos.service';
 
 describe('InfosPage', () => {
@@ -15,7 +14,7 @@ describe('InfosPage', () => {
     let infos = () => {
       return of(
         MOCKED_INFOS
-    );
+      );
     }
     infosServiceSpy = jasmine.createSpyObj('InfosService', { getInfos: infos() });
 
@@ -41,13 +40,30 @@ describe('InfosPage', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should retrieve infos on viewWillEnter', async () => {
+  it('should retrieve info on viewWillEnter', async () => {
     component.ionViewWillEnter();
     fixture.detectChanges();
     expect(component.tapInfos).toBe(MOCKED_INFOS);
   });
+
+  it('should display every available info', async () => {
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    const innerHTML = fixture.debugElement.nativeElement.innerHTML;
+    for (let prop in MOCKED_INFOS) {
+      expect(innerHTML).toContain(MOCKED_INFOS[prop]);
+    }
+  })
 });
 
 const MOCKED_INFOS = {
-  sn: 'testSN'
+  sn: 'testSN',
+  model: 'testModel',
+  appName: 'testAppName',
+  currentProtocol: 'testCurrentProtocol',
+  availableProtocols: 'testAvailableProtocols',
+  firmwareVersion: 'testFirmwareVersion',
+  targetCurrentProtocol: 'testTargetCurrentProtocol',
+  targetAvailableProtocol: 'testTargetAvailableProtocol',
+  targetFirmwareVersion: 'testTargetFirmwareVersion'
 }
