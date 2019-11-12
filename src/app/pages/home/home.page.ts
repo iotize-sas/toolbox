@@ -39,7 +39,6 @@ export class HomePage implements OnInit{
     const rssiPipe = new RssiToBarsPipe();
     this.deviceArraySubscription = this.comService.devicesArray().subscribe(arr => {
       this.devices = arr.sort((a, b) => rssiPipe.transform(b.rssi) - rssiPipe.transform(a.rssi));
-      console.log('new deviceArray, detecting changes');
       this.changeDetector.detectChanges();
     });
   }

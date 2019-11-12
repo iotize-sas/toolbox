@@ -13,6 +13,7 @@ import { IotizeNgComModule } from "@iotize/ng-com-services";
 import { Keyboard } from '@ionic-native/keyboard/ngx';
 import { NFC } from '@ionic-native/nfc/ngx';
 import { ComponentsModule } from './components/components.module';
+import { Dialogs } from '@ionic-native/dialogs/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,7 +30,8 @@ import { ComponentsModule } from './components/components.module';
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Keyboard,
-    NFC
+    NFC,
+    Dialogs
   ],
   bootstrap: [AppComponent]
 })

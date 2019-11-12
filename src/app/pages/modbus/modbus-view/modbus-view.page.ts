@@ -121,11 +121,7 @@ export class ModbusViewPage implements OnInit {
   }
 
   canSend() {
-    if (this.modbus.tapService.isReady) {
-      return (this.modbus.savedModbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
-      (this.modbus.savedModbusOptions.objectType !== ModbusOptions.ObjectType.INPUT_REGISTER);
-    }
-    return false;
+    return this.modbus.canSend();
   }
 
   keepLine(slidingEl?: IonItemSliding) {

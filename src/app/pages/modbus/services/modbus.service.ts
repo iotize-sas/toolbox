@@ -243,20 +243,23 @@ export class ModbusService {
     return this._monitoredIds.has(id);
   }
 
+  canSend() {
+    if (this.isReady) {
+      return (this.savedModbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
+      (this.savedModbusOptions.objectType !== ModbusOptions.ObjectType.INPUT_REGISTER);
+    }
+    return false;
+  }
+
   private _monitoredIds: Map<number, Subscription>; // Set of monitored Ids
 
   lastModbusRead?: ModbusReadAnswer
   
   savedModbusValues: Map<number, ModbusReadAnswer>; // Mapped by Ids
 
-  mockValues() {
-  
-    this.lastModbusRead = new ModbusReadAnswer(
-      this.displayedModbusOptions,
-      new Uint8Array([1,2])
-      );
-      console.log(this.lastModbusRead);
-    }
+  get isReady() {
+    return this.tapService.isReady
+  }
 
 }
 
