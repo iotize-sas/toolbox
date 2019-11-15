@@ -71,7 +71,13 @@ export class InfosService {
     .map(protocol => TargetProtocol[protocol]);
   }
   private async getTargetFirmwareVersion() {
-    const body = (await this.tapService.tap.service.target.getFirmwareVersion()).body();
+    let body;
+    try {
+      body = (await this.tapService.tap.service.adp.getAdpStatus()).body().header.version;
+    } catch (err) {
+      console.warn("could not retrieve adpStatus. reading targetFirmware. Error:", err);
+      body = (await this.tapService.tap.service.target.getFirmwareVersion()).body()
+    }
     return `${body.major}.${body.minor}.${body.patch}`
   }
 

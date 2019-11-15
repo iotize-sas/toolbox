@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { ModbusOptions, VariableFormat } from '@iotize/device-client.js/device/model';
 import { ModbusReadAnswer, ModbusConfig, DataDisplay, DisplayOptions, ByteOrder } from 'src/app/helpers/modbus-helper';
 import { NumberConverter } from '@iotize/device-client.js/client/impl';
-import { IoTizeTap } from '@iotize/ng-com-services';
 import { SettingsService } from 'src/app/services/settings.service';
 import { interval, Observable, Subscription } from 'rxjs';
 import { ResultCodeTranslation } from '@iotize/device-client.js/client/api/response';
+import { TapService } from 'src/app/services/tap.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,7 @@ export class ModbusService {
 
   displayedModbusOptions: ModbusConfig;
 
-  constructor(public deviceService: IoTizeTap,
+  constructor(public tapService: TapService,
     public settings: SettingsService) {
       this.savedModbusValues = new Map();
       this._monitoredIds = new Map();
@@ -50,11 +50,11 @@ export class ModbusService {
       config = this._savedModbusConfig;
     }
 
-    const response = await this.deviceService.tap.service.target.modbusRead(config);
+    const response = await this.tapService.tap.service.target.modbusRead(config);
     if (!response.isSuccessful()) {
       console.log('>>>>>>> ' + response.codeRet());
       if (firstTry) {
-        await this.deviceService.tap.service.target.connect();
+        await this.tapService.tap.service.target.connect();
         return this.read(false, config);
       }
       throw response.codeRet();
@@ -65,7 +65,7 @@ export class ModbusService {
   }
 
   async write(values: Uint8Array, options: ModbusOptions): Promise<void> {
-    const response = await this.deviceService.tap.service.target.modbusWrite({
+    const response = await this.tapService.tap.service.target.modbusWrite({
       options: options,
       data: values
     });
@@ -243,20 +243,23 @@ export class ModbusService {
     return this._monitoredIds.has(id);
   }
 
+  canSend() {
+    if (this.isReady) {
+      return (this.savedModbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
+      (this.savedModbusOptions.objectType !== ModbusOptions.ObjectType.INPUT_REGISTER);
+    }
+    return false;
+  }
+
   private _monitoredIds: Map<number, Subscription>; // Set of monitored Ids
 
   lastModbusRead?: ModbusReadAnswer
   
   savedModbusValues: Map<number, ModbusReadAnswer>; // Mapped by Ids
 
-  mockValues() {
-  
-    this.lastModbusRead = new ModbusReadAnswer(
-      this.displayedModbusOptions,
-      new Uint8Array([1,2])
-      );
-      console.log(this.lastModbusRead);
-    }
+  get isReady() {
+    return this.tapService.isReady
+  }
 
 }
 

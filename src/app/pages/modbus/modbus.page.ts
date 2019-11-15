@@ -18,8 +18,7 @@ export class ModbusPage implements OnInit {
 
   ngOnInit() {
     console.log('[ModbusViewPage] init');
-    this.events.subscribe('connected', () => this.changeDetector.detectChanges());
-    this.events.subscribe('disconnected', () => this.changeDetector.detectChanges());
+    this.modbus.tapService.connectionState.subscribe(() => this.changeDetector.detectChanges());
     this.events.subscribe('error-message', message => this.showToast(message));
     if (!this.modbus.settings.didFetchSettings) {
       this.modbus.settings.getUARTSettings();

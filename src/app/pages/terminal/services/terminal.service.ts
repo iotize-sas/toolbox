@@ -31,7 +31,7 @@ export class TerminalService {
   async send(data: string) {
     try {
       if (!this.tapService.isReady) {
-        this.events.publish('disconnected');
+        // this.events.publish('disconnected');
         return;
       }
       const dataArray = this.stringToData(data);
@@ -154,9 +154,6 @@ export class TerminalService {
 
   async login(username: string, password: string) {
     const didLog = await this.tapService.login(username, password);
-    if (didLog) {
-      this.events.publish('logged-in');
-    }
     return didLog;
   }
 

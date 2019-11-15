@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { TapService } from 'src/app/services/tap.service';
 import { Events, AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { ConnectionState } from '@iotize/device-client.js/protocol/api';
 
 @Component({
   selector: 'tap-status',
@@ -11,6 +12,7 @@ export class TapStatusComponent implements OnInit {
 
     appName: string = '';
     userName: string = '';
+    isConnected: boolean = false;
 
   constructor(public tapService: TapService,
     public events: Events,
@@ -20,14 +22,17 @@ export class TapStatusComponent implements OnInit {
     public toastController: ToastController) { }
 
   ngOnInit() {
-    this.events.subscribe('connected',() => {
-      console.log('binding tap status');
-      this.makeBinds();
-    });
-
-    this.events.subscribe('disconnected', () => {
-      this.changeDetector.detectChanges(); //force view update
-    })
+      this.tapService.connectionState.subscribe(state => {
+        if (state == ConnectionState.CONNECTED) {
+          this.isConnected = true
+          return this.makeBinds();
+        }
+        if (state == ConnectionState.DISCONNECTED) {
+          this.isConnected = false;
+          // this.changeDetector.detectChanges(); //force view update
+        }
+      }
+    );
   }
 
   async makeBinds() {
@@ -153,4 +158,5 @@ export class TapStatusComponent implements OnInit {
 
     toast.present();
   }
+
 }
