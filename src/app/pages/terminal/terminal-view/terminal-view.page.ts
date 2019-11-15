@@ -11,7 +11,7 @@ import { TerminalModalPage } from './terminal-modal/terminal-modal.page';
 })
 export class TerminalViewPage implements OnInit {
 
-  @ViewChild('content') content: IonContent;
+  @ViewChild('content', {static: false}) content: IonContent;
 
   data = '';
   linesCount = 0;

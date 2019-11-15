@@ -16,7 +16,7 @@ export class TerminalPage {
       this.terminal.tapService.connectionState.subscribe(() => this.changeDetector.detectChanges());
       this.events.subscribe('error-message', message => this.showToast(message));
   }
-  @ViewChild(IonTabs) tabs: IonTabs;
+  @ViewChild(IonTabs, {static: false}) tabs: IonTabs;
 
   async tabChanged() {
     console.log('tab changed');

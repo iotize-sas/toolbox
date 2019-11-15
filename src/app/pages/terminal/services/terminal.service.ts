@@ -154,9 +154,6 @@ export class TerminalService {
 
   async login(username: string, password: string) {
     const didLog = await this.tapService.login(username, password);
-    if (didLog) {
-      this.events.publish('logged-in');
-    }
     return didLog;
   }
 

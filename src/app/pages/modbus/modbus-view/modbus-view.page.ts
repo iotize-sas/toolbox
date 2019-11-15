@@ -18,7 +18,7 @@ import { ModbusRequestSettingsPage } from './modbus-request-settings/modbus-requ
 })
 export class ModbusViewPage implements OnInit {
 
-  @ViewChild(IonContent) content: IonContent;
+  @ViewChild(IonContent, {static: false}) content: IonContent;
 
   data = '';
 

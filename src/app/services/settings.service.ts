@@ -172,7 +172,10 @@ if (!triedReconnection){
     });
     this.events.subscribe('logged-in', () => {
       if (!this.didFetchSettings) {
-        this.getUARTSettings().catch(error => this.events.publish('error-message', error.message))
+        if (this.tapService.didReconnect) {
+          return this.setUARTSettings().catch(error => this.events.publish('error-message', error.message))
+        }
+        return this.getUARTSettings().catch(error => this.events.publish('error-message', error.message))
       }
     });
   }

@@ -53,7 +53,6 @@ export class AppComponent {
     public tapService: TapService
   ) {
     this.initializeApp();
-    // this.nfc.listenNFC();
   }
   
   private initializeApp() {
@@ -61,12 +60,16 @@ export class AppComponent {
       this.statusBar.styleLightContent();
       this.splashScreen.hide();
       this.nfc.listenNFC(); // iOS tweak
-      this.setAndroidBackButtonBehavior();
+      this.tapService.initSecureStorage();
+      if (this.platform.is('android')) {
+        this.setAndroidBackButtonBehavior();
+      }
     });
   }
 
   private exitApp() {
     if (this.platform.is('cordova')) {
+      this.tapService.disconnect();
       navigator['app'].exitApp();
     }
   }

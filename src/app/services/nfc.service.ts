@@ -3,7 +3,7 @@ import { NFC, NdefEvent } from '@ionic-native/nfc/ngx'
 import { Events, Platform } from '@ionic/angular';
 import { Observable, fromEvent } from 'rxjs';
 import { IoTizeComService } from '@iotize/ng-com-services';
-import { DiscoveredDeviceType } from 'plugins/cordova-plugin-iotize-ble';
+import { DiscoveredDeviceType } from '@iotize/cordova-plugin-iotize-ble';
 import { NFCComProtocol } from '@iotize/device-com-nfc.cordova';
 import { ComProtocolOptions, ComProtocol } from '@iotize/device-client.js/protocol/api';
 
