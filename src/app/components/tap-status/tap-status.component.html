@@ -1,12 +1,19 @@
-<div *ngIf="tapService.tap && tapService.tap.isConnected() && appName">
-  <p>
-    {{appName | uppercase}}
-  </p>
-  <p>
-    <ion-icon name="person"></ion-icon>{{userName}}
-  </p>
-  <ion-button *ngIf="userName == 'anonymous' || userName == ''" (click)="openLoginAlert()" expand="block">LOGIN
-  </ion-button>
-  <ion-button *ngIf="userName != 'anonymous' && userName != ''" (click)="openLogoutAlert()" expand="block">LOGOUT
-  </ion-button>
+<div>
+  <ng-container *ngIf="isConnected">
+    <p>
+      {{appName | uppercase}}
+    </p>
+    <p>
+      <ion-icon name="person"></ion-icon>{{userName}}
+    </p>
+    <ion-button *ngIf="userName == 'anonymous' || userName == ''" (click)="openLoginAlert()" expand="block">LOGIN
+    </ion-button>
+    <ion-button *ngIf="userName != 'anonymous' && userName != ''" (click)="openLogoutAlert()" expand="block">LOGOUT
+    </ion-button>
+  </ng-container>
+  <ng-container *ngIf="!isConnected">
+    <p>
+      No device connected
+    </p>
+  </ng-container>
 </div>

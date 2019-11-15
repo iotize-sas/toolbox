@@ -17,7 +17,7 @@ export class ModbusRequestSettingsPage {
     private keyboard: Keyboard,
     private navParams: NavParams) { }
 
-  protected isReady = false;
+  isReady = false;
   private _modbusRead?: ModbusReadAnswer;
   _displayMode?: DataDisplay;
   period?: number;

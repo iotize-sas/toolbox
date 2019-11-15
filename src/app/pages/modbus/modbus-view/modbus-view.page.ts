@@ -18,7 +18,7 @@ import { ModbusRequestSettingsPage } from './modbus-request-settings/modbus-requ
 })
 export class ModbusViewPage implements OnInit {
 
-  @ViewChild(IonContent) content: IonContent;
+  @ViewChild(IonContent, {static: false}) content: IonContent;
 
   data = '';
 
@@ -121,11 +121,7 @@ export class ModbusViewPage implements OnInit {
   }
 
   canSend() {
-    if (this.modbus.deviceService.isReady) {
-      return (this.modbus.savedModbusOptions.objectType !== ModbusOptions.ObjectType.DISCRET_INPUT) &&
-      (this.modbus.savedModbusOptions.objectType !== ModbusOptions.ObjectType.INPUT_REGISTER);
-    }
-    return false;
+    return this.modbus.canSend();
   }
 
   keepLine(slidingEl?: IonItemSliding) {

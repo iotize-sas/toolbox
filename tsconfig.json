@@ -2,6 +2,17 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "paths": {
+      "rxjs": [
+        "node_modules/rxjs/index",
+      ],
+      "rxjs/*": [
+        "node_modules/rxjs/*"
+      ],
+      "@iotize/device-client.js/*": [
+        "node_modules/@iotize/device-client.js/*"
+      ]
+    },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,

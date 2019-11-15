@@ -14,6 +14,8 @@ import { Keyboard } from '@ionic-native/keyboard/ngx';
 import { NFC } from '@ionic-native/nfc/ngx';
 import { AppVersion } from "@ionic-native/app-version/ngx";
 import { ComponentsModule } from './components/components.module';
+import { Dialogs } from '@ionic-native/dialogs/ngx';
+import { SecureStorage } from '@ionic-native/secure-storage/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,7 +33,8 @@ import { ComponentsModule } from './components/components.module';
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Keyboard,
     NFC,
-    AppVersion
+    Dialogs,
+    SecureStorage
   ],
   bootstrap: [AppComponent]
 })
