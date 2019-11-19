@@ -34,6 +34,7 @@ import { SecureStorage } from '@ionic-native/secure-storage/ngx';
     Keyboard,
     NFC,
     Dialogs,
+    AppVersion,
     SecureStorage
   ],
   bootstrap: [AppComponent]

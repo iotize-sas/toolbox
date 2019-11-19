@@ -1,6 +1,6 @@
 {
   "name": "iotize-toolbox",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "IoTize Solutions",
   "homepage": "https://www.iotize.com",
   "scripts": {
@@ -25,6 +25,7 @@
     "@angular/platform-browser": "~8.1.2",
     "@angular/platform-browser-dynamic": "~8.1.2",
     "@angular/router": "~8.1.2",
+    "@ionic-native/app-version": "^5.16.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/dialogs": "^5.15.1",
     "@ionic-native/keyboard": "^5.5.1",
@@ -35,7 +36,7 @@
     "@ionic/angular": "^4.7.1",
     "@iotize/cordova-plugin-iotize-ble": "^1.1.0-alpha.34",
     "@iotize/device-client.js": "0.0.1-alpha.105",
-    "@iotize/device-com-nfc.cordova": "^1.0.0-alpha.12",
+    "@iotize/device-com-nfc.cordova": "^1.0.0-alpha.13",
     "@iotize/ng-com-services": "0.0.1",
     "cordova-android": "8.1.0",
     "cordova-ios": "5.0.1",
