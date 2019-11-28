@@ -6,7 +6,7 @@
     <ion-title>
       Home
     </ion-title>
-    <ion-buttons slot="end" *ngIf="isIOS">
+    <ion-buttons slot="end" *ngIf="nfc.isAvailable">
       <ion-button (click)="beginNDEFSession()">
         <img src="/assets/nfc/nfc-logo-icon-18-49.png" alt="NFC" class="nfcLogo">
       </ion-button>

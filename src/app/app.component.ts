@@ -64,6 +64,9 @@ export class AppComponent {
       if (this.platform.is('android')) {
         this.setAndroidBackButtonBehavior();
       }
+      if (this.platform.is('ios')) {
+        this.nfc.updateAvailability();
+      }
     });
   }
 

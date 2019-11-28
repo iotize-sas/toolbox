@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable, Subscription, pipe, from } from 'rxjs';
 import { ComProtocol } from '@iotize/device-client.js/protocol/api';
 import { Events } from '@ionic/angular';
-import { timeout, first, finalize, filter, find, map } from 'rxjs/operators';
-import { CordovaInterface, BLEComProtocol, BLEScanner, DiscoveredDeviceType } from '@iotize/cordova-plugin-iotize-ble';
+import { timeout, finalize, find, map } from 'rxjs/operators';
+import { CordovaInterface, BLEComProtocol, BLEScanner, DiscoveredDeviceType, CordovaBLEScanResult } from '@iotize/cordova-plugin-iotize-ble';
 
 declare var iotizeBLE: CordovaInterface;
 
@@ -69,12 +69,16 @@ export class ComService
   // }
 
   private _scanForSpecificDeviceObservable(deviceNameOrAddress: string, timeOut = 1000) {
+    const areEqual = (device: CordovaBLEScanResult) => deviceNameOrAddress.includes(device.name.slice(-6)) || deviceNameOrAddress.includes(device.address.slice(-6));
+
+    console.debug('Scanning for device :' + deviceNameOrAddress);
+    this._scanner.start();
     return this._scanner.results.pipe(
       timeout(timeOut),
-      find(array => array.find( _ => _.name == deviceNameOrAddress || _.address == deviceNameOrAddress) !== undefined),
-      map(array => array.find( _ => _.name == deviceNameOrAddress || _.address == deviceNameOrAddress)),
+      find(array => array.find(areEqual) !== undefined),
+      map(array => array.find(areEqual)),
       finalize(() => this.stopScan())
-    )
+      );
   }
 
   async scanForSpecificDevice(deviceName: string, timeOut?: number): Promise<DiscoveredDeviceType> {

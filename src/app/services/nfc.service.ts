@@ -20,6 +20,7 @@ export interface NFCTag {
 export class NfcService implements IoTizeComService {
 
   private isListening = false;
+  public isAvailable = false;
 
   public lastTagRead: NFCTag = {
     appName: "",
@@ -31,6 +32,7 @@ export class NfcService implements IoTizeComService {
 
   constructor(public nfc: NFC,
     public events: Events, public platform: Platform) {
+
     this.events.subscribe('NFCPairing', () => {
       this.closeNFC();
     })
@@ -176,6 +178,14 @@ export class NfcService implements IoTizeComService {
   }
   clearDevices(except?: DiscoveredDeviceType[]): void {
     throw new Error('not Implemented');
+  }
+
+  async updateAvailability(): Promise<void> {
+    try {
+      this.isAvailable = await this.nfc.enabled() as boolean
+    } catch (error) {
+      console.error('updateAvailability:', error);
+    }
   }
 }
 

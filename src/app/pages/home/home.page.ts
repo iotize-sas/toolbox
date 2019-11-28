@@ -42,12 +42,10 @@ export class HomePage implements OnInit{
       this.changeDetector.detectChanges();
     });
   }
-  get isIOS() {
-    return this.platform.is('ios');
-  }
+  iosNFCAvailable: boolean = false;
 
   get isScanning() {
-    return this.comService.isScanning
+    return this.comService.isScanning;
   }
 
   get scanMessage() {
